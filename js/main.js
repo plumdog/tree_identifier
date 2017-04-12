@@ -1444,6 +1444,10 @@ class FinderForm {
 }
 
 $(document).ready(function() {
+    if ($('body.main').length === 0) {
+        return;
+    }
+
     var $table = $('table.tree-table');
     var table = new TreeTable($table);
     var treeFinder = new Finder(trees);
