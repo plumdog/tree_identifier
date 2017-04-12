@@ -81,7 +81,7 @@ var utils = {
 
 class Identifier {
     constructor(args) {
-        var {category, name, options, depends, pointDelta} = args;
+        var {category, name, options, depends, pointDelta, fullName} = args;
         this.category = category || 'Other';
         this.name = name;
         this.options = options;
@@ -92,6 +92,14 @@ class Identifier {
         // The score to deduct from perfect (1.0) if the options have
         // no point values assigned and the values do not match.
         this.pointDelta = pointDelta;
+        this.fullName = fullName || null;
+    }
+
+    getFullName() {
+        if (this.fullName) {
+            return this.fullName;
+        }
+        return utils.capitalize(this.name);
     }
 
     getSlugName() {
@@ -231,7 +239,8 @@ var coneShape = new Identifier({
 
 var leafColour = new Identifier({
     category: 'Leaf Colour',
-    name: 'Leaf colour',
+    name: 'Colour',
+    fullName: 'Leaf colour',
     options: {
         darkGreen: {
             name: "Dark green"
@@ -282,7 +291,8 @@ var compound = new Identifier({
 
 var shape = new Identifier({
     category: 'Leaf Shape',
-    name: 'Shape',
+    name: 'Overall Shape',
+    fullName: 'Leaf overall shape',
     options: {
         longThin: {
             name: 'Long thin',
@@ -354,6 +364,7 @@ var leafletPairsArrangement = new Identifier({
 var lobed = _bool({
     category: 'Leaf Shape',
     name: 'Lobed',
+    fullName: 'Leaf lobed',
     depends: [
         new Dependency({
             identifier: leafType,
@@ -364,7 +375,8 @@ var lobed = _bool({
 
 var lobedRibs = new Identifier({
     category: 'Leaf Shape',
-    name: "Lobed ribs",
+    name: "Lobe ribs",
+    fullName: 'Leaf lobe ribs',
     options: {
         radial: {},
         spinal: {}
@@ -510,6 +522,7 @@ var lobedEdgeShape = new Identifier({
 var barkColour = new Identifier({
     category: 'Bark',
     name: 'Colour',
+    fullName: 'Bark colour',
     // TODO: consider making this a 2D metric
     options: {
         white: {
@@ -744,14 +757,7 @@ class BoundIdentifier {
     }
 
     toString() {
-        var out = '';
-        var categoryName = this.identifier.category;
-        if (categoryName !== defaultCategory) {
-            out += categoryName + ' - ';
-        }
-        out += this.identifier.name;
-        out += ': ' + this.identifier.optionName(this.option);
-        return out;
+        return this.identifier.getFullName() + ': ' + this.identifier.optionName(this.option);
     }
 }
 
