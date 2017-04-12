@@ -30,7 +30,6 @@ var utils = {
         };
 
         sortKeyFn = sortKeyFn || id;
-
         
         var keyToItems = {};
         var key;
@@ -62,27 +61,49 @@ var utils = {
         });
     },
     capitalize: function(s) {
-        return s.charAt(0).toUpperCase() + s.slice(1);
+        return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+    },
+    title: function(s) {
+        return s.replace(
+                /\w\S*/g,
+            function(txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            }
+        );
     }
 };
 
 class Identifier {
     constructor(args) {
-        var {category, name, options, depends} = args;
+        var {category, name, options, depends, pointDelta} = args;
         this.category = category || 'Other';
         this.name = name;
         this.options = options;
         this.depends = depends || [];
+        if (typeof(pointDelta) === 'undefined') {
+            pointDelta = 2.0;
+        }
+        // The score to deduct from perfect (1.0) if the options have
+        // no point values assigned and the values do not match.
+        this.pointDelta = pointDelta;
     }
+
+    getSlugName() {
+        return this.name.replace(new RegExp(' ', 'g'), '_').toLowerCase();
+    };
 
     optionIsValid(option) {
         return this.options.hasOwnProperty(option)
     }
 
-    optionName(option) {
+    _assertOptionValid(option) {
         if (!this.optionIsValid(option)) {
             throw 'No such option ' + option;
         }
+    }
+
+    optionName(option) {
+        this._assertOptionValid(option);
 
         var info = this.options[option];
 
@@ -121,7 +142,7 @@ var defaultCategory = '__defaultCategory';
 
 var leafType = new Identifier({
     category: defaultCategory,
-    name: 'Leaf Type',
+    name: 'Leaf type',
     options: {
         needles: {},
         scales: {},
@@ -131,7 +152,7 @@ var leafType = new Identifier({
 
 var coneShape = new Identifier({
     category: 'Cone',
-    name: 'Cone Shape',
+    name: 'Cone shape',
     options: {
         barrel: {},
         egg: {}
@@ -147,7 +168,7 @@ var coneShape = new Identifier({
 
 var leafColour = new Identifier({
     category: 'Leaf Colour',
-    name: 'Leaf Colour',
+    name: 'Leaf colour',
     options: {
         darkGreen: {
             name: "Dark green"
@@ -158,15 +179,15 @@ var leafColour = new Identifier({
 
 var leafToothed = new Identifier({
     category: 'Leaf Shape',
-    name: 'Leaf Toothed',
+    name: 'Leaf toothed',
     options: {
-        none: {},
-        minute: {},
-        medium: {},
-        large: {},
-        double: {},
-        small: {},
-        coarse: {}
+        none: {point: 0.0},
+        minute: {point: 0.5},
+        small: {point: 0.8},
+        medium: {point: 1.0},
+        large: {point: 0.5},
+        double: {point: 2.0},
+        // coarse: {}
     },
     depends: [
         new Dependency({
@@ -178,7 +199,7 @@ var leafToothed = new Identifier({
 
 var compound = new Identifier({
     category: 'Leaf Arrangement',
-    name: 'Leaf Structure',
+    name: 'Leaf structure',
     options: {
         compoundFiveEndOfStalk: {
             name: 'Five from end of the stalk'
@@ -201,9 +222,12 @@ var shape = new Identifier({
     name: 'Shape',
     options: {
         longThin: {
-            name: 'Long thin'
+            name: 'Long thin',
+            point: 0.0
         },
-        round: {}
+        round: {
+            point: 1.5
+        }
     },
     depends: [
         new Dependency({
@@ -215,7 +239,7 @@ var shape = new Identifier({
 
 var length = new Identifier({
     category: 'Leaf Shape',
-    name: 'Leaf Length',
+    name: 'Leaf length',
     options: {
         moreThan10cm: {
             name: "More than 10cm"
@@ -277,7 +301,7 @@ var lobed = _bool({
 
 var lobedRibs = new Identifier({
     category: 'Leaf Shape',
-    name: "Lobed Ribs",
+    name: "Lobed ribs",
     options: {
         radial: {},
         spinal: {}
@@ -446,7 +470,13 @@ var darkGreenAbove = _bool({
 });
 var whiteWoolyAbove = _bool({
     category: 'Leaf Hairs',
-    name: 'White wooly above'
+    name: 'White wooly above',
+    depends: [
+        new Dependency({
+            identifier: leafType,
+            option: 'broad'
+        })
+    ]
 });
 var budAtBaseShortStalk = _bool({
     category: 'Leaf Stalk',
@@ -458,12 +488,24 @@ var glossyDarkGreenAbove = _bool({
 });
 var whiteHairsBeneath = _bool({
     category: 'Leaf Hairs',
-    name: 'White hairs beneath'
+    name: 'White hairs beneath',
+    depends: [
+        new Dependency({
+            identifier: leafType,
+            option: 'broad'
+        })
+    ]
 });
 
 var heartShaped = _bool({
     category: 'Leaf Shape',
-    name: 'Heart shaped'
+    name: 'Heart shaped',
+    depends: [
+        new Dependency({
+            identifier: leafType,
+            option: 'broad'
+        })
+    ]
 });
 var paleGreenBeneath = _bool({
     category: 'Leaf Colour',
@@ -471,11 +513,23 @@ var paleGreenBeneath = _bool({
 });
 var veryHairy = _bool({
     category: 'Leaf Hairs',
-    name: 'Very hairy'
+    name: 'Very hairy',
+    depends: [
+        new Dependency({
+            identifier: leafType,
+            option: 'broad'
+        })
+    ]
 });
 var smooth = _bool({
     category: 'Leaf Texture',
-    name: 'Smooth'
+    name: 'Smooth',
+    depends: [
+        new Dependency({
+            identifier: leafType,
+            option: 'broad'
+        })
+    ]
 });
 var flattenedLeafStalk = _bool({
     category: 'Leaf Stalk',
@@ -491,27 +545,68 @@ var stalkWhiteHairs = _bool({
 });
 var softlyHairy = _bool({
     category: 'Leaf Hairs',
-    name: 'Softly hairy'
+    name: 'Softly hairy',
+    depends: [
+        new Dependency({
+            identifier: leafType,
+            option: 'broad'
+        })
+    ]
 });
 var veins = _bool({
     category: 'Leaf Texture',
-    name: 'Veins'
+    name: 'Veins',
+    depends: [
+        new Dependency({
+            identifier: leafType,
+            option: 'broad'
+        })
+    ]
 });
 var wavyEdge = _bool({
     category: 'Leaf Shape',
-    name: 'Wavy edge'
+    name: 'Wavy edge',
+    depends: [
+        new Dependency({
+            identifier: leafType,
+            option: 'broad'
+        })
+    ]
 });
 
 
 class BoundIdentifier {
-    constructor(identifier, selectedOptions) {
-        $.each(selectedOptions, function(index, option) {
-            if (!identifier.optionIsValid(option)) {
-                throw "Invalid option " + option + " for " + identifier.name;
-            }
-        });
+    constructor(identifier, selectedOption) {
+        if (!identifier.optionIsValid(selectedOption)) {
+            throw "Invalid option " + option + " for " + identifier.name;
+        }
         this.identifier = identifier;
-        this.options = selectedOptions;
+        this.option = selectedOption;
+    }
+
+    optionScore(option) {
+        if (!this.identifier.optionIsValid(option)) {
+            throw "Invalid selected option " + option + " for " + this.identifier.name;
+        }
+
+        var selectedOptionInfo = this.identifier.options[option];
+        var correctOptionInfo = this.identifier.options[this.option];
+
+        var selectedScorePoint = selectedOptionInfo['point'];
+        var correctScorePoint = correctOptionInfo['point'];
+
+        if ((typeof(selectedScorePoint) !== 'undefined') && (typeof(correctScorePoint) !== 'undefined')) {
+            var dist = Math.abs(selectedScorePoint - correctScorePoint);
+            return 1.0 - dist;
+        }
+
+        
+
+        if (option === this.option) {
+            return 1.0;
+        }
+
+        return 1.0 - this.identifier.pointDelta;
     }
 }
 
@@ -520,9 +615,8 @@ class Item {
         this.name = name;
         this.identification = [];
     }
-    id(identifier /* varargs */) {
-        var selectedOptions = Array.prototype.slice.call(arguments, 1);
-        this.identification.push(new BoundIdentifier(identifier, selectedOptions))
+    id(identifier, selectedOption) {
+        this.identification.push(new BoundIdentifier(identifier, selectedOption))
         return this;
     }
 }
@@ -642,13 +736,6 @@ var trees = [
         .id(shape, 'longThin')
         .id(length, 'moreThan10cm')
         .id(leafToothed, 'minute'),
-    new Item('Bird Cherry')
-        .id(leafType, 'broad')
-        .id(compound, 'simple')
-        .id(lobed, false)
-        .id(shape, 'longThin')
-        .id(length, 'moreThan10cm')
-        .id(leafToothed, 'medium'),
     new Item('Sweet Chestnut')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -733,7 +820,7 @@ var trees = [
         .id(compound, 'simple')
         .id(lobed, false)
         .id(shape, 'round')
-        .id(leafToothed, 'medium', 'coarse', 'double')
+        .id(leafToothed, 'medium')
         .id(leafTipShape, 'tapered'),
     new Item('Downy Birch')
         .id(leafType, 'broad')
@@ -770,6 +857,8 @@ var trees = [
         .id(wavyEdge, true)
 ];
 
+// trees = [trees[0], trees[20]];
+
 
 class TreeTable {
     constructor($table) {
@@ -777,45 +866,192 @@ class TreeTable {
         this.identifiers = [];
     }
 
-    reset() {
+    reset(includeScores) {
         this.$table.find('tbody').empty();
+        this.$table.find('th.score').toggle(includeScores);
     }
 
-    load(rows) {
-        this.reset();
+    loadMatched(matchedRows, includeScores) {
+        if (typeof(includeScores) == 'undefined') {
+            includeScores = true;
+        }
+
         var self = this;
-        utils.arrEachSorted(
-            rows,
-            function(index, row) {
-                self.addRow(row);
-            },
-            function(item) {
-                return item.name;
-            }
-        );
+        this.reset(includeScores);
+        $.each(matchedRows, function(index, row) {
+            self.addRow(row, includeScores);
+        });
     }
 
-    addRow(row) {
+    addRow(row, includeScores) {
+        includeScores = Boolean(includeScores);
+
+        var item = row.item;
+        var score = row.getScore();
+
         var $tr = $('<tr/>');
-        var $species = $('<td/>').text(row.name);
+        var $species = $('<td/>').text(item.name);
         var $identification = $('<td/>');
-        var $identificationList = $('<ul>')
-        $.each(row.identification, function(index, value) {
-            var optionNames = [];
-            $.each(value.options, function(i, option) {
-                optionNames.push(value.identifier.optionName(option));
-            });
+        var $identificationList = $('<ul>').addClass('identification');
+        $.each(item.identification, function(index, value) {
             $identificationList.append(
-                $('<li>').text(value.identifier.name + ': ' + optionNames)
+                $('<li>').addClass('identifier identifier-' + value.identifier.getSlugName()).text(value.identifier.name + ': ' + value.identifier.optionName(value.option))
             );
         });
+
         $identification.append($identificationList);
 
         $tr.append($species);
         $tr.append($identification);
+        $identificationList.data('identification', item.identification);
+
+        if (includeScores) {
+            var $score = $('<td/>').text(score);
+            $tr.append($score);
+        }
+
+        var self = this;
+
+        $tr.on('click', function() {
+            $tr.toggleClass('selected');
+
+            var $selected = self.$table.find('tr.selected');
+            if ($selected.length > 2) {
+                $selected.not($tr).removeClass('selected');
+            }
+
+            $selected = self.$table.find('tr.selected');
+            if ($selected.length == 2) {
+                self.highlightDiff(
+                    $($selected[0]),
+                    $($selected[1])
+                )
+            } else {
+                self.clearDiff();
+            }
+
+            return false;
+        })
 
         this.$table.find('tbody').append($tr);
-    };
+    }
+
+    clearDiff() {
+        this.$table.find('.identifier').removeClass('selected-matching selected-differing selected-maybe');
+    }
+
+    highlightDiff($tr1, $tr2) {
+        var identification1 = $tr1.find('.identification').data('identification');
+        var identification2 = $tr2.find('.identification').data('identification');
+
+        var matchingSlugs = [];
+        var differingSlugs = [];
+        var slug;
+        $.each(identification1, function(i, boundIdentifier1) {
+            $.each(identification2, function(j, boundIdentifier2) {
+                if (Object.is(boundIdentifier1.identifier, boundIdentifier2.identifier)) {
+                    slug = boundIdentifier1.identifier.getSlugName();
+                    if (boundIdentifier1.option === boundIdentifier2.option) {
+                        matchingSlugs.push(slug);
+                    } else {
+                        differingSlugs.push(slug);
+                    }
+                }
+            });
+        });
+
+        $.each(matchingSlugs, function(i, slug) {
+            $tr1.find('.identifier-' + slug).addClass('selected-matching');
+            $tr2.find('.identifier-' + slug).addClass('selected-matching');
+        });
+
+        $.each(differingSlugs, function(i, slug) {
+            $tr1.find('.identifier-' + slug).addClass('selected-differing');
+            $tr2.find('.identifier-' + slug).addClass('selected-differing');
+        });
+        $tr1.find('.identifier').not('.selected-matching').not('.selected-differing').addClass('selected-maybe');
+        $tr2.find('.identifier').not('.selected-matching').not('.selected-differing').addClass('selected-maybe');
+    }
+}
+
+class MatchedItem {
+    constructor(item, identifiersAndValues) {
+        this.item = item;
+        this.identifiersAndValues = identifiersAndValues;
+    }
+
+    getScore() {
+        if (!this.hasOwnProperty('_score')) {
+            this._score = this._itemMatchScoreAll();
+        }
+        return this._score;
+    }
+
+    _itemMatchScore(identifier, value) {
+        var score = null;
+
+        $.each(this.item.identification, function(index, id) {
+            // Not the right identifier - ignore
+            if (!Object.is(identifier, id.identifier)) {
+                return true;  // continue
+            }
+
+            // Correct identifier, check if the selected value matches
+            // the item's values.
+            score = id.optionScore(value);
+            return false;
+        });
+
+        return score;
+    }
+
+    _distillScores(scores) {
+        scores = this._sanitiseScores(scores);
+
+        if (scores.length == 0) {
+            return null;
+        }
+
+        var total = 0;
+        var score;
+        for (var i = 0; i < scores.length; i++) {
+            score = scores[i];
+            total += score;
+        }
+        return total;
+    }
+
+    _sanitiseScores(scores) {
+        var saneScores = [];
+        var score;
+        for (var i = 0; i < scores.length; i++) {
+            score = scores[i];
+            if (score === null) {
+                continue;
+            }
+
+            if (score > 1.0) {
+                score = 1.0;
+            } else if (score < -1.0) {
+                score = -1.0;
+            }
+
+            saneScores.push(score);
+        }
+        return saneScores;
+    }
+
+    _itemMatchScoreAll() {
+        var self = this;
+        var scores = [];
+        $.each(this.identifiersAndValues, function(index, identifierAndValue) {
+            var identifier = identifierAndValue[0];
+            var value = identifierAndValue[1];
+            var score = self._itemMatchScore(identifier, value);
+            scores.push(score);
+        });
+        return self._distillScores(scores);
+    }
 }
 
 class Finder {
@@ -835,51 +1071,32 @@ class Finder {
         return found;
     }
 
-    itemMatches(item, identifier, value) {
-        var matches = false;
-
-
-
-        $.each(item.identification, function(index, id) {
-            var trialIdentifier = id.identifier;
-            var selectedOptions = id.options;
-
-
-
-            // Not the right identifier - ignore
-            if (!Object.is(identifier, trialIdentifier)) {
-                return true;  // continue
-            }
-
-            // Correct identifier, check if the selected value matches
-            // the item's values.
-            matches = ($.inArray(value, selectedOptions) !== -1);
-            return false;
-        });
-
-        return matches;
-    }
-
-    itemMatchesAll(item, identifiersAndValues) {
-        var self = this;
-        var matchesAll = true;
-        $.each(identifiersAndValues, function(index, identifierAndValue) {
-            var identifier = identifierAndValue[0];
-            var value = identifierAndValue[1];
-            if (!self.itemMatches(item, identifier, value)) {
-                matchesAll = false;
-                return false;
-            }
-        });
-        return matchesAll;
-    }
-
     getFilteredItems(identifiersAndValues) {
-        var filteredItems = [];
+        var matchedItems = [];
         var self = this;
+
         $.each(this.items, function(index, item) {
-            if (self.itemMatchesAll(item, identifiersAndValues)) {
+            matchedItems.push(new MatchedItem(item, identifiersAndValues));
+        });
+
+        var filteredItems = [];
+        $.each(matchedItems, function(index, item) {
+            if ((item.getScore() === null) || (item.getScore() > 0.5)) {
                 filteredItems.push(item);
+            }
+        });
+
+        // Sort by score, highest first.
+        filteredItems.sort(function(a, b) {
+            var scoreCmp = (b.getScore() - a.getScore());
+            if (scoreCmp) {
+                return scoreCmp;
+            }
+
+            if (a.item.name < b.item.name) {
+                return -1;
+            } else {
+                return 1
             }
         });
         return filteredItems;
@@ -952,13 +1169,9 @@ class FinderForm {
         return $form;
     };
 
-    getSlugName(identifier) {
-        return identifier.name.replace(' ', '_').toLowerCase();
-    };
-
     getLabel(identifier) {
         return $('<label/>')
-            .attr('for', 'id_' + this.getSlugName(identifier))
+            .attr('for', 'id_' + identifier.getSlugName())
             .addClass('col-xs-4 col-form-label')
             .text(identifier.name);
     };
@@ -987,7 +1200,7 @@ class FinderForm {
         var value;
         var self = this;
         $.each(this.identifiers, function(name, identifier) {
-            slug = self.getSlugName(identifier);
+            slug = identifier.getSlugName();
             value = formValues[slug];
             if (value !== undefined) {
                 values.push([identifier, formValues[slug]]);
@@ -1065,8 +1278,8 @@ class FinderForm {
 
     getInput(identifier) {
         var $input = $('<select/>')
-            .attr('name', this.getSlugName(identifier))
-            .attr('id', 'id_' + this.getSlugName(identifier))
+            .attr('name', identifier.getSlugName())
+            .attr('id', 'id_' + identifier.getSlugName())
             .addClass('form-control');
         $input.append($('<option/>').attr('value', '').text('--'))
         var toTypes = {};
@@ -1092,14 +1305,16 @@ class FinderForm {
 $(document).ready(function() {
     var $table = $('table.tree-table');
     var table = new TreeTable($table);
-    table.load(trees);
-
     var treeFinder = new Finder(trees);
 
-    var $formWrapper = $('div.tree-form-wrapper');
-    var finderForm = new FinderForm(treeFinder.getIdentifiers(), function(values) {
+    var formChangeCallback = function(values) {
         var filteredTrees = treeFinder.getFilteredItems(values);
-        table.load(filteredTrees);
-    });
+        var noInputs = (values.length == 0);
+        table.loadMatched(filteredTrees, !noInputs);
+    }
+    formChangeCallback([]);
+
+    var $formWrapper = $('div.tree-form-wrapper');
+    var finderForm = new FinderForm(treeFinder.getIdentifiers(), formChangeCallback);
     $formWrapper.html(finderForm.getElement());
 });
