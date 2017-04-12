@@ -92,14 +92,7 @@ class Identifier {
         // The score to deduct from perfect (1.0) if the options have
         // no point values assigned and the values do not match.
         this.pointDelta = pointDelta;
-        this.fullName = fullName || null;
-    }
-
-    getFullName() {
-        if (this.fullName) {
-            return this.fullName;
-        }
-        return utils.capitalize(this.name);
+        this.fullName = fullName || utils.capitalize(this.name);
     }
 
     getSlugName() {
@@ -757,7 +750,7 @@ class BoundIdentifier {
     }
 
     toString() {
-        return this.identifier.getFullName() + ': ' + this.identifier.optionName(this.option);
+        return this.identifier.fullName + ': ' + this.identifier.optionName(this.option);
     }
 }
 
