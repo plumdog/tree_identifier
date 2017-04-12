@@ -72,6 +72,9 @@ var utils = {
         );
     },
     round: function(num, places) {
+        if (num === null) {
+            return null;
+        }
         return Number(Math.round(num + 'e' + places) + 'e-' + places);
     }
 };
