@@ -70,6 +70,9 @@ var utils = {
                 return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
             }
         );
+    },
+    round: function(num, places) {
+        return Number(Math.round(num + 'e' + places) + 'e-' + places);
     }
 };
 
@@ -1089,7 +1092,7 @@ class TreeTable {
         $identificationList.data('identification', item.identification);
 
         if (includeScores) {
-            var $score = $('<td/>').text(score);
+            var $score = $('<td/>').text(utils.round(score, 2));
             $tr.append($score);
         }
 
