@@ -109,6 +109,28 @@ class Identifier {
 
         return info.name || utils.capitalize(option);
     }
+
+    depsSatisfied(identifiersAndValues) {
+        if (this.depends.length == 0) {
+            return true;
+        }
+
+        var allSatisfied = true;
+        $.each(this.depends, function(index, dependency) {
+            var depSatisfied = dependency.satisfied(identifiersAndValues);
+
+            if (!depSatisfied) {
+                allSatisfied = false;
+                return false;
+            }
+
+            if (!dependency.identifier.depsSatisfied(identifiersAndValues)) {
+                allSatisfied = false;
+                return false;
+            }
+        });
+        return allSatisfied;
+    }
 }
 
 var _bool = function(args) {
@@ -131,10 +153,45 @@ var _bool = function(args) {
 
 class Dependency {
     constructor(args) {
-        var {identifier, option, hard} = args;
+        var {identifier, option, hard, invert} = args;
         this.identifier = identifier;
         this.option = option;
         this.hard = Boolean(hard);
+        this.invert = Boolean(invert);
+    }
+
+    satisfied(identifiersAndValues) {
+        var depIdentifier = this.identifier;
+        var depValue = this.option;
+
+        var depSatisfied = null;
+
+        $.each(identifiersAndValues, function(index2, selectedIdentifierAndValue) {
+            var selectedIdentifier = selectedIdentifierAndValue[0];
+            var selectedValue = selectedIdentifierAndValue[1];
+
+            if (!Object.is(selectedIdentifier, depIdentifier)) {
+                return true;
+            }
+
+            if (selectedValue !== depValue) {
+                depSatisfied = false;
+                return false;
+            } else {
+                depSatisfied = true;
+                return true
+            }
+        });
+
+        if (depSatisfied === null) {
+            depSatisfied = !this.hard;
+        }
+
+        if (this.invert) {
+            depSatisfied = !depSatisfied;
+        }
+
+        return depSatisfied;
     }
 }
 
@@ -578,7 +635,7 @@ var wavyEdge = _bool({
 class BoundIdentifier {
     constructor(identifier, selectedOption) {
         if (!identifier.optionIsValid(selectedOption)) {
-            throw "Invalid option " + option + " for " + identifier.name;
+            throw "Invalid option " + selectedOption + " for " + identifier.name;
         }
         this.identifier = identifier;
         this.option = selectedOption;
@@ -895,7 +952,9 @@ class TreeTable {
         var $identificationList = $('<ul>').addClass('identification');
         $.each(item.identification, function(index, value) {
             $identificationList.append(
-                $('<li>').addClass('identifier identifier-' + value.identifier.getSlugName()).text(value.identifier.name + ': ' + value.identifier.optionName(value.option))
+                $('<li>')
+                    .addClass('identifier identifier-' + value.identifier.getSlugName())
+                    .text(value.toString())
             );
         });
 
@@ -1081,7 +1140,7 @@ class Finder {
 
         var filteredItems = [];
         $.each(matchedItems, function(index, item) {
-            if ((item.getScore() === null) || (item.getScore() > 0.5)) {
+            if ((item.getScore() === null) || (item.getScore() >= 0)) {
                 filteredItems.push(item);
             }
         });
@@ -1153,7 +1212,7 @@ class FinderForm {
                         $(this).closest('.outer').find('.inner').toggleClass('hide');
                         return false;
                     });
-                    $catDiv.append($('<h3/>').append($catLink));
+                    $catDiv.append($('<h4/>').append($catLink));
                     $catDiv.append($rowsDiv.addClass('inner hide'));
                     $form.append($catDiv);
                 }
@@ -1216,58 +1275,11 @@ class FinderForm {
         $form.find('.form-group').removeClass('hide');
         var self = this;
 
-        var depsSatisfied = function(trialIdentifier, identifiersAndValues) {
-            if (trialIdentifier.depends.length == 0) {
-                return true;
-            }
-
-            var allSatisfied = true;
-            $.each(trialIdentifier.depends, function(index, dependency) {
-                var depIdentifier = dependency.identifier;
-                var depValue = dependency.option;
-
-                var depSatisfied = null;
-
-                $.each(identifiersAndValues, function(index2, selectedIdentifierAndValue) {
-                    var selectedIdentifier = selectedIdentifierAndValue[0];
-                    var selectedValue = selectedIdentifierAndValue[1];
-
-                    if (!Object.is(selectedIdentifier, depIdentifier)) {
-                        return true;
-                    }
-
-                    if (selectedValue !== depValue) {
-                        depSatisfied = false;
-                        return false;
-                    } else {
-                        depSatisfied = true;
-                        return true
-                    }
-                });
-
-                if (depSatisfied === null) {
-                    depSatisfied = !dependency.hard;
-                }
-
-                if (!depSatisfied) {
-                    allSatisfied = false;
-                    return false;
-                }
-
-                if (!depsSatisfied(depIdentifier, identifiersAndValues)) {
-                    allSatisfied = false;
-                    return false;
-                }
-
-            });
-            return allSatisfied;
-        };
-
         $form.find('select').each(function() {
             var $input = $(this);
             var inputIdentifier = $input.data('identifier');
 
-            if (!depsSatisfied(inputIdentifier, identifiersAndValues)) {
+            if (!inputIdentifier.depsSatisfied(identifiersAndValues)) {
                 $input.closest('.form-group').addClass('hide');
             }
         });
