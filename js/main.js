@@ -81,7 +81,7 @@ var utils = {
 
 class Identifier {
     constructor(args) {
-        var {category, name, options, depends, pointDelta, fullName} = args;
+        var {category, name, options, depends, pointDelta, fullName, slugName} = args;
         this.category = category || 'Other';
         this.name = name;
         this.options = options;
@@ -93,11 +93,8 @@ class Identifier {
         // no point values assigned and the values do not match.
         this.pointDelta = pointDelta;
         this.fullName = fullName || utils.capitalize(this.name);
+        this.slugName = slugName || this.fullName.replace(new RegExp(' ', 'g'), '_').toLowerCase();
     }
-
-    getSlugName() {
-        return this.name.replace(new RegExp(' ', 'g'), '_').toLowerCase();
-    };
 
     optionIsValid(option) {
         return this.options.hasOwnProperty(option)
@@ -1082,7 +1079,7 @@ class TreeTable {
         $.each(item.identification, function(index, value) {
             $identificationList.append(
                 $('<li>')
-                    .addClass('list-group-item identifier identifier-' + value.identifier.getSlugName())
+                    .addClass('list-group-item identifier identifier-' + value.identifier.slugName)
                     .text(value.toString())
             );
         });
@@ -1138,7 +1135,7 @@ class TreeTable {
         $.each(identification1, function(i, boundIdentifier1) {
             $.each(identification2, function(j, boundIdentifier2) {
                 if (Object.is(boundIdentifier1.identifier, boundIdentifier2.identifier)) {
-                    slug = boundIdentifier1.identifier.getSlugName();
+                    slug = boundIdentifier1.identifier.slugName;
                     if (boundIdentifier1.option === boundIdentifier2.option) {
                         matchingSlugs.push(slug);
                     } else {
@@ -1249,10 +1246,17 @@ class Finder {
 
     getIdentifiers() {
         var found = {};
+        var key;
         $.each(this.items, function(index, item) {
-            $.each(item.identification, function(idIndex, identifier) {
-                if (!found.hasOwnProperty(identifier.identifier.name)) {
-                    found[identifier.identifier.name] = identifier.identifier;
+            $.each(item.identification, function(idIndex, boundIdentifier) {
+                key = boundIdentifier.identifier.slugName;
+                if (!found.hasOwnProperty(key)) {
+                    found[key] = boundIdentifier.identifier;
+                } else {
+                    if (!Object.is(found[key], boundIdentifier.identifier)) {
+                        // The key already exists but is different identifier.
+                        throw "Duplicate for slug " + key;
+                    }
                 }
             });
         });
@@ -1359,7 +1363,7 @@ class FinderForm {
 
     getLabel(identifier) {
         return $('<label/>')
-            .attr('for', 'id_' + identifier.getSlugName())
+            .attr('for', 'id_' + identifier.slugName)
             .addClass('col-xs-4 col-form-label')
             .text(identifier.name);
     };
@@ -1388,7 +1392,7 @@ class FinderForm {
         var value;
         var self = this;
         $.each(this.identifiers, function(name, identifier) {
-            slug = identifier.getSlugName();
+            slug = identifier.slugName;
             value = formValues[slug];
             if (value !== undefined) {
                 values.push([identifier, formValues[slug]]);
@@ -1419,8 +1423,8 @@ class FinderForm {
 
     getInput(identifier) {
         var $input = $('<select/>')
-            .attr('name', identifier.getSlugName())
-            .attr('id', 'id_' + identifier.getSlugName())
+            .attr('name', identifier.slugName)
+            .attr('id', 'id_' + identifier.slugName)
             .addClass('form-control');
         $input.append($('<option/>').attr('value', '').text('--'))
         var toTypes = {};
