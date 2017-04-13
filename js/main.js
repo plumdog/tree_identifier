@@ -1052,9 +1052,8 @@ class TreeTable {
         this.identifiers = [];
     }
 
-    reset(includeScores) {
-        this.$table.find('tbody').empty();
-        this.$table.find('th.score').toggle(includeScores);
+    reset() {
+        this.$table.find('.tree-table-body').empty();
     }
 
     loadMatched(matchedRows, includeScores) {
@@ -1063,7 +1062,7 @@ class TreeTable {
         }
 
         var self = this;
-        this.reset(includeScores);
+        this.reset();
         $.each(matchedRows, function(index, row) {
             self.addRow(row, includeScores);
         });
@@ -1075,40 +1074,41 @@ class TreeTable {
         var item = row.item;
         var score = row.getScore();
 
-        var $tr = $('<tr/>');
-        var $species = $('<td/>').text(item.name);
-        var $identification = $('<td/>');
-        var $identificationList = $('<ul>').addClass('identification');
+        var $rowDiv = $('<div/>').addClass('panel panel-default');
+        var $species = $('<div/>')
+            .addClass('panel-heading')
+            .append($('<h5/>').text('Species: ' + item.name));
+        var $identificationList = $('<ul>').addClass('identification list-group');
         $.each(item.identification, function(index, value) {
             $identificationList.append(
                 $('<li>')
-                    .addClass('identifier identifier-' + value.identifier.getSlugName())
+                    .addClass('list-group-item identifier identifier-' + value.identifier.getSlugName())
                     .text(value.toString())
             );
         });
 
-        $identification.append($identificationList);
-
-        $tr.append($species);
-        $tr.append($identification);
+        $rowDiv.append($species);
+        $rowDiv.append($identificationList);
         $identificationList.data('identification', item.identification);
 
         if (includeScores) {
-            var $score = $('<td/>').text(utils.round(score, 2));
-            $tr.append($score);
+            var $score = $('<div/>')
+                .addClass('panel-footer')
+                .text('Score: ' + utils.round(score, 2));
+            $rowDiv.append($score);
         }
 
         var self = this;
 
-        $tr.on('click', function() {
-            $tr.toggleClass('selected');
+        $rowDiv.on('click', function() {
+            $rowDiv.toggleClass('panel-primary');
 
-            var $selected = self.$table.find('tr.selected');
+            var $selected = self.$table.find('div.panel-primary');
             if ($selected.length > 2) {
-                $selected.not($tr).removeClass('selected');
+                $selected.not($rowDiv).removeClass('panel-primary');
             }
 
-            $selected = self.$table.find('tr.selected');
+            $selected = self.$table.find('div.panel-primary');
             if ($selected.length == 2) {
                 self.highlightDiff(
                     $($selected[0]),
@@ -1121,16 +1121,16 @@ class TreeTable {
             return false;
         })
 
-        this.$table.find('tbody').append($tr);
+        this.$table.find('.tree-table-body').append($rowDiv);
     }
 
     clearDiff() {
-        this.$table.find('.identifier').removeClass('selected-matching selected-differing selected-maybe');
+        this.$table.find('.identifier').removeClass('list-group-item-success list-group-item-warning list-group-item-danger');
     }
 
-    highlightDiff($tr1, $tr2) {
-        var identification1 = $tr1.find('.identification').data('identification');
-        var identification2 = $tr2.find('.identification').data('identification');
+    highlightDiff($rowDiv1, $rowDiv2) {
+        var identification1 = $rowDiv1.find('.identification').data('identification');
+        var identification2 = $rowDiv2.find('.identification').data('identification');
 
         var matchingSlugs = [];
         var differingSlugs = [];
@@ -1149,16 +1149,16 @@ class TreeTable {
         });
 
         $.each(matchingSlugs, function(i, slug) {
-            $tr1.find('.identifier-' + slug).addClass('selected-matching');
-            $tr2.find('.identifier-' + slug).addClass('selected-matching');
+            $rowDiv1.find('.identifier-' + slug).addClass('list-group-item-success');
+            $rowDiv2.find('.identifier-' + slug).addClass('list-group-item-success');
         });
 
         $.each(differingSlugs, function(i, slug) {
-            $tr1.find('.identifier-' + slug).addClass('selected-differing');
-            $tr2.find('.identifier-' + slug).addClass('selected-differing');
+            $rowDiv1.find('.identifier-' + slug).addClass('list-group-item-danger');
+            $rowDiv2.find('.identifier-' + slug).addClass('list-group-item-danger');
         });
-        $tr1.find('.identifier').not('.selected-matching').not('.selected-differing').addClass('selected-maybe');
-        $tr2.find('.identifier').not('.selected-matching').not('.selected-differing').addClass('selected-maybe');
+        $rowDiv1.find('.identifier').not('.list-group-item-success').not('.list-group-item-danger').addClass('list-group-item-warning');
+        $rowDiv2.find('.identifier').not('.list-group-item-success').not('.list-group-item-danger').addClass('list-group-item-warning');
     }
 }
 
@@ -1448,7 +1448,7 @@ $(document).ready(function() {
         return;
     }
 
-    var $table = $('table.tree-table');
+    var $table = $('.tree-table');
     var table = new TreeTable($table);
     var treeFinder = new Finder(trees);
 
