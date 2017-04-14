@@ -1071,9 +1071,20 @@ class TreeTable {
         var score = row.getScore();
 
         var $rowDiv = $('<div/>').addClass('panel panel-default');
+        var $imageLink = $('<a/>')
+            .attr('href', 'https://www.google.com/search?tbm=isch&q=' + item.name + ' tree')
+            .addClass('image-search btn btn-default')
+            .attr('style', 'float: right')
+            .attr('target', '_blank')
+            .text('Images');
         var $species = $('<div/>')
             .addClass('panel-heading')
-            .append($('<h5/>').text('Species: ' + item.name));
+            .append($('<h5/>')
+                    .attr('style', 'float: left')
+                    .text('Species: ' + item.name))
+            .append($imageLink)
+            .append($('<div/>').attr('style', 'clear: both'))
+        ;
         var $identificationList = $('<ul>').addClass('identification list-group');
         $.each(item.identification, function(index, value) {
             $identificationList.append(
@@ -1096,6 +1107,10 @@ class TreeTable {
 
         var self = this;
 
+        $imageLink.on('click', function(event) {
+            event.stopPropagation();
+        });
+
         $rowDiv.on('click', function() {
             $rowDiv.toggleClass('panel-primary');
 
@@ -1115,7 +1130,7 @@ class TreeTable {
             }
 
             return false;
-        })
+        });
 
         this.$table.find('.tree-table-body').append($rowDiv);
     }
