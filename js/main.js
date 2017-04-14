@@ -624,10 +624,6 @@ var lobesThreeToEight = Identifier.bool({
     ]
 });
 
-var leafStalkRed = Identifier.bool({
-    category: 'Leaf Stalk',
-    name: 'Leaf stalk red'
-});
 var twigsShinyDarkBrown = Identifier.bool({
     category: 'Twig',
     name: 'Twigs shiny dark brown',
@@ -700,14 +696,6 @@ var smooth = Identifier.bool({
             hard: true
         })
     ]
-});
-var flattenedLeafStalk = Identifier.bool({
-    category: 'Leaf Stalk',
-    name: 'Flattened leaf stalk'
-});
-var stemWhiteHairs = Identifier.bool({
-    category: 'Leaf Stalk',
-    name: 'Stem white hairs'
 });
 var stalkWhiteHairs = Identifier.bool({
     category: 'Leaf Stalk',
@@ -1025,7 +1013,6 @@ var trees = [
         .id(lobed, false)
         .id(shape, 'longThin')
         .id(length, 'lessThan10cm')
-        .id(leafStalkRed, true)
         .id(leafToothed, 'double')
         .id(barkColour, 'grey'),
     new Item('Bird Cherry')
@@ -1097,7 +1084,6 @@ var trees = [
         .id(leafToothed, 'medium')
         .id(leafTipShape, 'abrupt')
         .id(smooth, true)
-        .id(flattenedLeafStalk, true)
         .id(barkColour, 'paleGrey'),
     new Item('Silver Birch')
         .id(leafType, 'broad')
@@ -1114,7 +1100,6 @@ var trees = [
         .id(shape, 'round')
         .id(leafToothed, 'medium')
         .id(leafTipShape, 'tapered')
-        .id(stemWhiteHairs, true)
         .id(stalkWhiteHairs, true)
         .id(barkColour, 'paleGrey'),
     new Item('Elm')
