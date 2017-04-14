@@ -1286,11 +1286,15 @@ class Finder {
         });
 
         var filteredItems = [];
-        $.each(matchedItems, function(index, item) {
-            if ((item.getScore() === null) || (item.getScore() >= 0)) {
-                filteredItems.push(item);
-            }
-        });
+        if (identifiersAndValues.length === 0) {
+            filteredItems = matchedItems;
+        } else {
+            $.each(matchedItems, function(index, item) {
+                if ((item.getScore() !== null) && (item.getScore() >= 0)) {
+                    filteredItems.push(item);
+                }
+            });
+        }
 
         // Sort by score, highest first.
         filteredItems.sort(function(a, b) {
