@@ -351,6 +351,26 @@ var leafletPairsArrangement = new Identifier({
     ]
 });
 
+var leafletNumber = new Identifier({
+    category: 'Leaf Arrangement',
+    name: 'Number of pairs',
+    options: {
+        twoOrThree: {
+            name: 'Two or three'
+        },
+        manyPairs: {
+            name: 'Many'
+        }
+    },
+    depends: [
+        new Dependency({
+            identifier: compound,
+            option: 'compoundPairs',
+            hard: true
+        })
+    ]
+});
+
 var lobed = _bool({
     category: 'Leaf Shape',
     name: 'Lobed',
@@ -460,29 +480,6 @@ var needlePairsThreeOrFive = _bool({
         })
     ]
 });
-var leafletsTwoOrThreePairs = _bool({
-    category: 'Leaf Arrangement',
-    name: 'Leaflets two or three pairs',
-    depends: [
-        new Dependency({
-            identifier: compound,
-            option: 'compoundPairs',
-            hard: true
-        })
-    ]
-});
-var leafletsManyPairs = _bool({
-    category: 'Leaf Arrangement',
-    name: 'Leaflets many pairs',
-    depends: [
-        new Dependency({
-            identifier: compound,
-            option: 'compoundPairs',
-            hard: true
-        })
-    ]
-});
-
 var lobedEdge = _bool({
     category: 'Leaf Shape',
     name: 'Lobed edge',
@@ -838,18 +835,20 @@ var trees = [
     new Item('Elder')
         .id(leafType, 'broad')
         .id(compound, 'compoundPairs')
-        .id(leafletsTwoOrThreePairs, true)
+        .id(leafletNumber, 'twoOrThree')
+        .id(leafletPairsArrangement, 'symmetric')
         .id(barkColour, 'greyBrown'),
     new Item('Ash')
         .id(leafType, 'broad')
         .id(compound, 'compoundPairs')
-        .id(leafletsManyPairs, true)
+        .id(leafletNumber, 'manyPairs')
         .id(leafletPairsArrangement, 'symmetric')
-        .id(barkColour, 'grey'),
+        .id(barkColour, 'grey')
+        .id(shape, 'longThin'),
     new Item('Rowan')
         .id(leafType, 'broad')
         .id(compound, 'compoundPairs')
-        .id(leafletsManyPairs, true)
+        .id(leafletNumber, 'manyPairs')
         .id(leafletPairsArrangement, 'alternate')
         .id(barkColour, 'grey'),
     new Item('Sycamore')
