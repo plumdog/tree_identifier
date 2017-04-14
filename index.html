@@ -23,8 +23,18 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">Tree Identifier</a>
+                <a class="navbar-brand" href="#">
+                    Tree Identifier
+                </a>
             </div>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a type="button" class="btn" data-toggle="modal" data-target="#myModal" style="float: right">
+                        About
+                    </a>
+                </li>
+            </ul>
         </div>
     </nav>
 
@@ -35,8 +45,34 @@
         <div class="tree-form-wrapper" style="margin-top: 40px;">
         </div>
 
+        <hr />
+
         <div class="tree-table">
             <div class="tree-table-body">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">About</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Home page:
+                        <a href="https://github.com/plumdog/tree_identifier" target="_blank">
+                            https://github.com/plumdog/tree_identifier
+                        </a>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
