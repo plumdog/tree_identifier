@@ -146,6 +146,11 @@ class Identifier {
 
         return new Identifier(args);
     }
+
+    dependency(args) {
+        args.identifier = this;
+        return new Dependency(args);
+    }
 }
 
 
@@ -222,8 +227,7 @@ var cones = Identifier.bool({
     category: 'Cone',
     name: 'Cone',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'needles'
         })
     ],
@@ -245,8 +249,7 @@ var coneShape = new Identifier({
         egg: {}
     },
     depends: [
-        new Dependency({
-            identifier: cones,
+        cones.dependency({
             option: true
         })
     ]
@@ -278,8 +281,7 @@ var leafToothed = new Identifier({
         // coarse: {}
     },
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
@@ -298,8 +300,7 @@ var compound = new Identifier({
         simple: {}
     },
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
@@ -319,8 +320,7 @@ var shape = new Identifier({
         }
     },
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
@@ -338,8 +338,7 @@ var length = new Identifier({
         }
     },
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
@@ -354,8 +353,7 @@ var leafTipShape = new Identifier({
         abrupt: {}
     },
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
@@ -369,8 +367,7 @@ var leafletPairsArrangement = new Identifier({
         alternate: {}
     },
     depends: [
-        new Dependency({
-            identifier: compound,
+        compound.dependency({
             option: 'compoundPairs',
             hard: true
         })
@@ -389,8 +386,7 @@ var leafletNumber = new Identifier({
         }
     },
     depends: [
-        new Dependency({
-            identifier: compound,
+        compound.dependency({
             option: 'compoundPairs',
             hard: true
         })
@@ -402,8 +398,7 @@ var lobed = Identifier.bool({
     name: 'Lobed',
     fullName: 'Leaf lobed',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
@@ -414,8 +409,7 @@ var asymmetricalBase = Identifier.bool({
     name: 'Asymmetrical base',
     fullName: 'Asymmetrical leaf base',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
@@ -430,8 +424,7 @@ var lobedRibs = new Identifier({
         spinal: {}
     },
     depends: [
-        new Dependency({
-            identifier: lobed,
+        lobed.dependency({
             option: true
         })
     ]
@@ -440,25 +433,29 @@ var lobedRibs = new Identifier({
 
 var twigSideShoots = Identifier.bool({
     category: 'Twig',
-    name: 'Twig side shoots'
-});
-var suckerBase = Identifier.bool({
-    category: 'Leaf Stalk',
-    name: 'Needle sucker base',
+    name: 'Twig side shoots',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'needles',
             hard: true
         })
     ]
 });
+var suckerBase = Identifier.bool({
+    category: 'Leaf Stalk',
+    name: 'Needle sucker base',
+    depends: [
+        leafType.dependency({
+            option: 'needles',
+            hard: true
+        })
+    ],
+});
 var pegLeftWhenRemoved = Identifier.bool({
     category: 'Leaf Stalk',
     name: 'Needle peg left when removed',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'needles',
             hard: true
         })
@@ -468,8 +465,7 @@ var needlesAllDirections = Identifier.bool({
     category: 'Leaf Arrangement',
     name: 'Needles all directions',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'needles',
             hard: true
         })
@@ -479,8 +475,7 @@ var needlesUndersideTwoWhiteLines = Identifier.bool({
     category: 'Leaf Colour',
     name: 'Needles underside two white lines',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'needles',
             hard: true
         })
@@ -490,8 +485,7 @@ var pineappleSmell = Identifier.bool({
     category: 'Leaf Smell',
     name: 'Pineapple smell when leaves crushed',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'scales',
             hard: true
         })
@@ -501,8 +495,7 @@ var sharpWhiteBand = Identifier.bool({
     category: 'Leaf Colour',
     name: 'Sharp white band',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'needles'
         })
     ]
@@ -511,8 +504,7 @@ var needlePairsThreeOrFive = Identifier.bool({
     category: 'Leaf Arrangement',
     name: 'Needle pairs - three or five',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'needles',
             hard: true
         })
@@ -539,8 +531,7 @@ var lobedEdgeShape = new Identifier({
         }
     },
     depends: [
-        new Dependency({
-            identifier: lobed,
+        lobed.dependency({
             option: true,
             hard: true
         })
@@ -626,8 +617,7 @@ var lobesThreeToEight = Identifier.bool({
     category: 'Leaf Shape',
     name: 'Lobes three to eight',
     depends: [
-        new Dependency({
-            identifier: lobed,
+        lobed.dependency({
             option: true,
             hard: true
         })
@@ -640,7 +630,13 @@ var leafStalkRed = Identifier.bool({
 });
 var twigsShinyDarkBrown = Identifier.bool({
     category: 'Twig',
-    name: 'Twigs shiny dark brown'
+    name: 'Twigs shiny dark brown',
+    depends: [
+        leafType.dependency({
+            option: 'broad',
+            hard: true
+        })
+    ]
 });
 var darkGreenAbove = Identifier.bool({
     category: 'Leaf Colour',
@@ -650,8 +646,7 @@ var whiteWoolyAbove = Identifier.bool({
     category: 'Leaf Hairs',
     name: 'White wooly above',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
@@ -668,8 +663,7 @@ var whiteHairsBeneath = Identifier.bool({
     category: 'Leaf Hairs',
     name: 'White hairs beneath',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
@@ -679,8 +673,7 @@ var heartShaped = Identifier.bool({
     category: 'Leaf Shape',
     name: 'Heart shaped',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
@@ -693,8 +686,7 @@ var veryHairy = Identifier.bool({
     category: 'Leaf Hairs',
     name: 'Very hairy',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
@@ -703,8 +695,7 @@ var smooth = Identifier.bool({
     category: 'Leaf Texture',
     name: 'Smooth',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad',
             hard: true
         })
@@ -726,8 +717,7 @@ var softlyHairy = Identifier.bool({
     category: 'Leaf Hairs',
     name: 'Softly hairy',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
@@ -736,8 +726,7 @@ var veins = Identifier.bool({
     category: 'Leaf Texture',
     name: 'Veins',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad',
             hard: true
         })
@@ -747,8 +736,7 @@ var wavyEdge = Identifier.bool({
     category: 'Leaf Shape',
     name: 'Wavy edge',
     depends: [
-        new Dependency({
-            identifier: leafType,
+        leafType.dependency({
             option: 'broad'
         })
     ]
