@@ -115,46 +115,44 @@ class Identifier {
         return info.name || utils.capitalize(option);
     }
 
-    depsSatisfied(identifiersAndValues) {
-        if (this.depends.length == 0) {
-            return true;
-        }
-
+    depsSatisfied(identifiersAndValues, forceHard) {
+        forceHard = Boolean(forceHard);
         var allSatisfied = true;
         $.each(this.depends, function(index, dependency) {
-            var depSatisfied = dependency.satisfied(identifiersAndValues);
+            var depSatisfied = dependency.satisfied(identifiersAndValues, forceHard);
 
             if (!depSatisfied) {
                 allSatisfied = false;
                 return false;
             }
 
-            if (!dependency.identifier.depsSatisfied(identifiersAndValues)) {
+            if (!dependency.identifier.depsSatisfied(identifiersAndValues, forceHard)) {
                 allSatisfied = false;
                 return false;
             }
         });
         return allSatisfied;
     }
+
+    static bool(args) {
+        var {category, name, depends} = args;
+
+        return new Identifier({
+            category: category,
+            name: name,
+            options: {
+                true: {
+                    name: 'Yes'
+                },
+                false: {
+                    name: 'No'
+                }
+            },
+            depends: depends || []
+        });
+    }
 }
 
-var _bool = function(args) {
-    var {category, name, depends} = args;
-
-    return new Identifier({
-        category: category,
-        name: name,
-        options: {
-            true: {
-                name: 'Yes'
-            },
-            false: {
-                name: 'No'
-            }
-        },
-        depends: depends || []
-    });
-};
 
 class Dependency {
     constructor(args) {
@@ -165,7 +163,8 @@ class Dependency {
         this.invert = Boolean(invert);
     }
 
-    satisfied(identifiersAndValues) {
+    satisfied(identifiersAndValues, forceHard) {
+        forceHard = Boolean(forceHard) || this.hard;
         var depIdentifier = this.identifier;
         var depValue = this.option;
 
@@ -189,7 +188,7 @@ class Dependency {
         });
 
         if (depSatisfied === null) {
-            depSatisfied = !this.hard;
+            depSatisfied = !forceHard;
         }
 
         if (this.invert) {
@@ -385,10 +384,22 @@ var leafletNumber = new Identifier({
     ]
 });
 
-var lobed = _bool({
+var lobed = Identifier.bool({
     category: 'Leaf Shape',
     name: 'Lobed',
     fullName: 'Leaf lobed',
+    depends: [
+        new Dependency({
+            identifier: leafType,
+            option: 'broad'
+        })
+    ]
+});
+
+var asymmetricalBase = Identifier.bool({
+    category: 'Leaf Shape',
+    name: 'Asymmetrical base',
+    fullName: 'Asymmetrical leaf base',
     depends: [
         new Dependency({
             identifier: leafType,
@@ -414,11 +425,11 @@ var lobedRibs = new Identifier({
 });
 
 
-var twigSideShoots = _bool({
+var twigSideShoots = Identifier.bool({
     category: 'Twig',
     name: 'Twig side shoots'
 });
-var suckerBase = _bool({
+var suckerBase = Identifier.bool({
     category: 'Leaf Stalk',
     name: 'Needle sucker base',
     depends: [
@@ -429,7 +440,7 @@ var suckerBase = _bool({
         })
     ]
 });
-var pegLeftWhenRemoved = _bool({
+var pegLeftWhenRemoved = Identifier.bool({
     category: 'Leaf Stalk',
     name: 'Needle peg left when removed',
     depends: [
@@ -440,7 +451,7 @@ var pegLeftWhenRemoved = _bool({
         })
     ]
 });
-var needlesAllDirections = _bool({
+var needlesAllDirections = Identifier.bool({
     category: 'Leaf Arrangement',
     name: 'Needles all directions',
     depends: [
@@ -451,7 +462,7 @@ var needlesAllDirections = _bool({
         })
     ]
 });
-var needlesUndersideTwoWhiteLines = _bool({
+var needlesUndersideTwoWhiteLines = Identifier.bool({
     category: 'Leaf Colour',
     name: 'Needles underside two white lines',
     depends: [
@@ -462,7 +473,7 @@ var needlesUndersideTwoWhiteLines = _bool({
         })
     ]
 });
-var pineappleSmell = _bool({
+var pineappleSmell = Identifier.bool({
     category: 'Leaf Smell',
     name: 'Pineapple smell when leaves crushed',
     depends: [
@@ -473,7 +484,7 @@ var pineappleSmell = _bool({
         })
     ]
 });
-var sharpWhiteBand = _bool({
+var sharpWhiteBand = Identifier.bool({
     category: 'Leaf Colour',
     name: 'Sharp white band',
     depends: [
@@ -483,7 +494,7 @@ var sharpWhiteBand = _bool({
         })
     ]
 });
-var needlePairsThreeOrFive = _bool({
+var needlePairsThreeOrFive = Identifier.bool({
     category: 'Leaf Arrangement',
     name: 'Needle pairs - three or five',
     depends: [
@@ -494,27 +505,29 @@ var needlePairsThreeOrFive = _bool({
         })
     ]
 });
-var lobedEdge = _bool({
-    category: 'Leaf Shape',
-    name: 'Lobed edge',
-    depends: [
-        new Dependency({
-            identifier: lobed,
-            option: true,
-            hard: true
-        })
-    ]
-});
 var lobedEdgeShape = new Identifier({
     category: 'Leaf Shape',
     name: "Lobed edge shape",
     options: {
-        thorny: {},
-        toothed: {}
+        rounded: {
+            point: 0.0
+        },
+        blunt: {
+            point: 0.5
+        },
+        toothed: {
+            point: 1.8
+        },
+        thorny: {
+            point: 2.0
+        },
+        sharp: {
+            point: 2.2
+        }
     },
     depends: [
         new Dependency({
-            identifier: lobedEdge,
+            identifier: lobed,
             option: true,
             hard: true
         })
@@ -596,31 +609,31 @@ var barkColour = new Identifier({
         }
     }
 });
-var lobesThreeToEight = _bool({
+var lobesThreeToEight = Identifier.bool({
     category: 'Leaf Shape',
     name: 'Lobes three to eight',
     depends: [
         new Dependency({
-            identifier: lobedEdge,
+            identifier: lobed,
             option: true,
             hard: true
         })
     ]
 });
 
-var leafStalkRed = _bool({
+var leafStalkRed = Identifier.bool({
     category: 'Leaf Stalk',
     name: 'Leaf stalk red'
 });
-var twigsShinyDarkBrown = _bool({
+var twigsShinyDarkBrown = Identifier.bool({
     category: 'Twig',
     name: 'Twigs shiny dark brown'
 });
-var darkGreenAbove = _bool({
+var darkGreenAbove = Identifier.bool({
     category: 'Leaf Colour',
     name: 'Dark green above'
 });
-var whiteWoolyAbove = _bool({
+var whiteWoolyAbove = Identifier.bool({
     category: 'Leaf Hairs',
     name: 'White wooly above',
     depends: [
@@ -630,15 +643,15 @@ var whiteWoolyAbove = _bool({
         })
     ]
 });
-var budAtBaseShortStalk = _bool({
+var budAtBaseShortStalk = Identifier.bool({
     category: 'Leaf Stalk',
     name: 'Bud at base short stalk'
 })
-var glossyDarkGreenAbove = _bool({
+var glossyDarkGreenAbove = Identifier.bool({
     category: 'Leaf Colour',
     name: 'Glossy dark green above'
 });
-var whiteHairsBeneath = _bool({
+var whiteHairsBeneath = Identifier.bool({
     category: 'Leaf Hairs',
     name: 'White hairs beneath',
     depends: [
@@ -649,7 +662,7 @@ var whiteHairsBeneath = _bool({
     ]
 });
 
-var heartShaped = _bool({
+var heartShaped = Identifier.bool({
     category: 'Leaf Shape',
     name: 'Heart shaped',
     depends: [
@@ -659,11 +672,11 @@ var heartShaped = _bool({
         })
     ]
 });
-var paleGreenBeneath = _bool({
+var paleGreenBeneath = Identifier.bool({
     category: 'Leaf Colour',
     name: 'Pale green beneath'
 });
-var veryHairy = _bool({
+var veryHairy = Identifier.bool({
     category: 'Leaf Hairs',
     name: 'Very hairy',
     depends: [
@@ -673,7 +686,7 @@ var veryHairy = _bool({
         })
     ]
 });
-var smooth = _bool({
+var smooth = Identifier.bool({
     category: 'Leaf Texture',
     name: 'Smooth',
     depends: [
@@ -684,19 +697,19 @@ var smooth = _bool({
         })
     ]
 });
-var flattenedLeafStalk = _bool({
+var flattenedLeafStalk = Identifier.bool({
     category: 'Leaf Stalk',
     name: 'Flattened leaf stalk'
 });
-var stemWhiteHairs = _bool({
+var stemWhiteHairs = Identifier.bool({
     category: 'Leaf Stalk',
     name: 'Stem white hairs'
 });
-var stalkWhiteHairs = _bool({
+var stalkWhiteHairs = Identifier.bool({
     category: 'Leaf Stalk',
     name: 'Stalk white hairs'
 });
-var softlyHairy = _bool({
+var softlyHairy = Identifier.bool({
     category: 'Leaf Hairs',
     name: 'Softly hairy',
     depends: [
@@ -706,7 +719,7 @@ var softlyHairy = _bool({
         })
     ]
 });
-var veins = _bool({
+var veins = Identifier.bool({
     category: 'Leaf Texture',
     name: 'Veins',
     depends: [
@@ -717,7 +730,7 @@ var veins = _bool({
         })
     ]
 });
-var wavyEdge = _bool({
+var wavyEdge = Identifier.bool({
     category: 'Leaf Shape',
     name: 'Wavy edge',
     depends: [
@@ -795,7 +808,26 @@ class Item {
         }
     }
 
+    referenceIdentifiersAndValues() {
+        var identifierAndValues = [];
+        $.each(this.identification, function(i, boundIdentifier) {
+            identifierAndValues.push(
+                [boundIdentifier.identifier, boundIdentifier.option]
+            )
+        });
+        return identifierAndValues;
+    }
+
     id(identifier, selectedOption) {
+        // Check that if the added identifier has dependencies that
+        // they are satisfied already. Note that this means that
+        // identifiers must be added in dependency-aware order.
+
+        var identifierAndValues = this.referenceIdentifiersAndValues();
+        if (!identifier.depsSatisfied(identifierAndValues, true)) {
+            throw 'Adding ' + identifier.name + ' to ' + this.name + ' breaks deps';
+        }
+
         this.identification.push(new BoundIdentifier(identifier, selectedOption))
         return this;
     }
@@ -917,6 +949,8 @@ var trees = [
     new Item('Sycamore')
         .id(leafType, 'broad')
         .id(compound, 'simple')
+        .id(lobed, true)
+        .id(lobedEdgeShape, 'toothed')
         .id(lobedRibs, 'radial')
         .id(leafToothed, 'medium')
         .id(barkColour, 'pinkGrey'),
@@ -924,24 +958,25 @@ var trees = [
         .id(leafType, 'broad')
         .id(compound, 'simple')
         .id(lobed, true)
+        .id(lobedEdgeShape, 'blunt')
         .id(lobedRibs, 'radial')
         .id(leafToothed, 'none')
-        .id(lobedEdge, true)
         .id(barkColour, 'lightBrown'),
     // idBool('symmetricPairs') true),  // ?
     new Item('London Plane')
         .id(leafType, 'broad')
         .id(compound, 'simple')
         .id(lobed, true)
+        .id(lobedEdgeShape, 'sharp')
         .id(lobedRibs, 'radial')
         .id(leafToothed, 'none')
-        .id(lobedEdge, true)
         .id(barkColour, 'greenGrey'),
     // idBool('alternatePairs') true),
     new Item('Oak')
         .id(leafType, 'broad')
         .id(compound, 'simple')
         .id(lobed, true)
+        .id(lobedEdgeShape, 'rounded')
         .id(lobedRibs, 'spinal')
         .id(lobesThreeToEight, true)
         .id(barkColour, 'greyBrown'),
@@ -1075,6 +1110,13 @@ var trees = [
         .id(stemWhiteHairs, true)
         .id(stalkWhiteHairs, true)
         .id(barkColour, 'paleGrey'),
+    new Item('Elm')
+        .id(leafType, 'broad')
+        .id(compound, 'simple')
+        .id(lobed, false)
+        .id(shape, 'round')
+        .id(leafToothed, 'medium')
+        .id(asymmetricalBase, true),
     new Item('Common Alder')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1165,6 +1207,15 @@ class TreeTable {
         var $rowDiv = $('<div/>').addClass('panel panel-default');
         var $imageLinks = this.searchLinks(item);
 
+        var $imageLinkDivs = $();
+        $imageLinks.each(function() {
+            $imageLinkDivs = $imageLinkDivs.add(
+                $('<div/>')
+                    .addClass('btn-group')
+                    .attr('role', 'group')
+                    .append($(this)));
+        });
+
         var $species = $('<div/>')
             .addClass('panel-heading')
             .append($('<h5/>')
@@ -1172,7 +1223,8 @@ class TreeTable {
                     .text('Species: ' + item.name))
             .append($('<div/>')
                     .attr('style', 'float: right')
-                    .append($imageLinks))
+                    .addClass('btn-toolbar')
+                    .append($imageLinkDivs))
             .append($('<div/>').attr('style', 'clear: both'));
 
         var $identificationList = $('<ul>').addClass('identification list-group');
@@ -1415,6 +1467,8 @@ class FinderForm {
         // Callback to be called when the form changes, called with an
         // array of pairs [identifier, selectedValue]
         this.callback = callback;
+        this.inputs = [];
+        this.buildElement();
     }
 
     getCategorisedIdentifiers() {
@@ -1430,9 +1484,10 @@ class FinderForm {
         return categorised;
     }
 
-    getElement() {
+    buildElement() {
         var $form = $('<form/>');
         var self = this;
+        var $input;
         utils.objEachSorted(
             this.getCategorisedIdentifiers(),
             function(category, identifiers) {
@@ -1442,7 +1497,9 @@ class FinderForm {
                     function(index, identifier) {
                         var $row = $('<div/>').addClass('form-group row');
                         $row.append(self.getLabel(identifier));
-                        $row.append($('<div/>').addClass('col-xs-6').append(self.getInput(identifier)));
+                        var $input = self.getInput(identifier);
+                        $row.append($('<div/>').addClass('col-xs-6').append($input));
+                        self.inputs.push($input);
                         $rowsDiv.append($row);
                     },
                     function(item) {
@@ -1471,8 +1528,8 @@ class FinderForm {
                 return category;
             }
         );
-        this.hideFields($form, []);
-        return $form;
+        this.$form = $form;
+        this.hideFields([]);
     };
 
     getLabel(identifier) {
@@ -1483,11 +1540,10 @@ class FinderForm {
     };
 
     onChange($inputElement) {
-        var $form = $inputElement.closest('form');
         var formValues = {};
         var $input;
 
-        $form.find('select').each(function() {
+        this.$form.find('select').each(function() {
             $input = $(this);
 
             if ($input.val() !== '') {
@@ -1515,14 +1571,14 @@ class FinderForm {
 
         this.callback(values);
 
-        this.hideFields($form, values);
+        this.hideFields(values);
     }
 
-    hideFields($form, identifiersAndValues) {
-        $form.find('.form-group').removeClass('hide');
+    hideFields(identifiersAndValues) {
+        this.$form.find('.form-group').removeClass('hide');
         var self = this;
 
-        $form.find('select').each(function() {
+        this.$form.find('select').each(function() {
             var $input = $(this);
             var inputIdentifier = $input.data('identifier');
 
@@ -1531,8 +1587,8 @@ class FinderForm {
             }
         });
 
-        $form.find('.outer').addClass('hide');
-        $form.find('.form-group').not('.hide').closest('.outer').removeClass('hide');
+        this.$form.find('.outer').addClass('hide');
+        this.$form.find('.form-group').not('.hide').closest('.outer').removeClass('hide');
     }
 
     getInput(identifier) {
@@ -1558,7 +1614,13 @@ class FinderForm {
             self.onChange($(this));
         });
         return $input;
-    };
+    }
+
+    reset() {
+        $.each(this.inputs, function(i, $input) {
+            $input.val('');
+        });
+    }
 }
 
 $(document).ready(function() {
@@ -1569,15 +1631,23 @@ $(document).ready(function() {
     var $table = $('.tree-table');
     var table = new TreeTable($table);
     var treeFinder = new Finder(trees);
+    var $reset = $('.reset');
 
     var formChangeCallback = function(values) {
         var filteredTrees = treeFinder.getFilteredItems(values);
         var noInputs = (values.length == 0);
         table.loadMatched(filteredTrees, !noInputs);
+        $reset.toggleClass('hide', noInputs);
     }
     formChangeCallback([]);
 
     var $formWrapper = $('div.tree-form-wrapper');
     var finderForm = new FinderForm(treeFinder.getIdentifiers(), formChangeCallback);
-    $formWrapper.html(finderForm.getElement());
+
+    $reset.on('click', function() {
+        finderForm.reset();
+        formChangeCallback([]);
+    });
+
+    $formWrapper.html(finderForm.$form);
 });
