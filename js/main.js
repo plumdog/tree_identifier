@@ -81,7 +81,7 @@ var utils = {
 
 class Identifier {
     constructor(args) {
-        var {category, name, options, depends, pointDelta, fullName, slugName} = args;
+        var {category, name, options, depends, pointDelta, fullName, slugName, searchTermFn} = args;
         this.category = category || 'Other';
         this.name = name;
         this.options = options;
@@ -94,6 +94,7 @@ class Identifier {
         this.pointDelta = pointDelta;
         this.fullName = fullName || utils.capitalize(this.name);
         this.slugName = slugName || this.fullName.replace(new RegExp(' ', 'g'), '_').toLowerCase();
+        this.searchTermFn = searchTermFn || null;
     }
 
     optionIsValid(option) {
@@ -208,6 +209,19 @@ var leafType = new Identifier({
         needles: {},
         scales: {},
         broad: {}
+    },
+    searchTermFn: function(option, item) {
+        if (option === 'needles') {
+            return {
+                name: 'Needle images',
+                termSuffix: 'needles'
+            }
+        } else if ((option === 'scales') || (option === 'broad')) {
+            return {
+                name: 'Leaf Images',
+                termSuffix: 'leaves'
+            }
+        }
     }
 });
 
@@ -574,6 +588,12 @@ var barkColour = new Identifier({
             name: 'Black/Brown',
             point: 3.0
         }
+    },
+    searchTermFn: function(option, item) {
+        return {
+            name: 'Bark images',
+            termSuffix: 'bark'
+        }
     }
 });
 var lobesThreeToEight = _bool({
@@ -746,16 +766,58 @@ class BoundIdentifier {
     toString() {
         return this.identifier.fullName + ': ' + this.identifier.optionName(this.option);
     }
+
+    searchTerm(item) {
+        if (this.identifier.searchTermFn) {
+            var identifierSearchTerm = this.identifier.searchTermFn(this.option, item);
+            var term = (identifierSearchTerm.term
+                        || item.defaultSearchTerm + ' ' + identifierSearchTerm.termSuffix);
+            return {
+                name: identifierSearchTerm.name,
+                term: term
+            }
+        }
+    }
 }
 
 class Item {
     constructor(name, extra) {
         this.name = name;
         this.identification = [];
+
+        var {defaultSearchSuffix} = extra || {};
+
+        this.defaultSearchSuffix = (typeof defaultSearchSuffix !== 'undefined') ? defaultSearchSuffix : 'tree'
+        if (this.defaultSearchSuffix) {
+            this.defaultSearchTerm = this.name + ' ' + this.defaultSearchSuffix;
+        } else {
+            this.defaultSearchTerm = this.name;
+        }
     }
+
     id(identifier, selectedOption) {
         this.identification.push(new BoundIdentifier(identifier, selectedOption))
         return this;
+    }
+
+    searchTerms() {
+        var searches = [];
+
+        var searchTerm;
+        var self = this;
+        $.each(this.identification, function(i, boundIdentifier) {
+            searchTerm = boundIdentifier.searchTerm(self);
+            if (searchTerm) {
+                searches.push(searchTerm);
+            }
+        });
+
+        searches.push({
+            name: 'Images',
+            term: this.defaultSearchTerm
+        });
+
+        return searches;
     }
 }
 
@@ -890,7 +952,7 @@ var trees = [
         .id(lobesThreeToEight, false)
         .id(lobedEdgeShape, 'thorny')
         .id(barkColour, 'greyBrown'),
-    new Item('Wild Service Tree')
+    new Item('Wild Service Tree', {defaultSearchSuffix: ''})
         .id(leafType, 'broad')
         .id(compound, 'simple')
         .id(lobed, true)
@@ -1064,6 +1126,29 @@ class TreeTable {
         });
     }
 
+    searchLinkElement(term, text) {
+        var $imageLink = $('<a/>')
+            .attr('href', 'https://www.google.com/search?tbm=isch&q=' + term)
+            .addClass('item-search btn btn-default')
+            .attr('target', '_blank')
+            .text(text);
+        return $imageLink;
+    }
+
+    searchLinks(item) {
+        var $imageLinks = $();
+        var self = this;
+        $.each(item.searchTerms(), function(i, nameAndValue) {
+            var name = nameAndValue.name;
+            var value = nameAndValue.term;
+
+            var $link = self.searchLinkElement(value, name);
+
+            $imageLinks = $imageLinks.add($link);
+        });
+        return $imageLinks;
+    }
+
     addRow(row, includeScores) {
         includeScores = Boolean(includeScores);
 
@@ -1071,20 +1156,18 @@ class TreeTable {
         var score = row.getScore();
 
         var $rowDiv = $('<div/>').addClass('panel panel-default');
-        var $imageLink = $('<a/>')
-            .attr('href', 'https://www.google.com/search?tbm=isch&q=' + item.name + ' tree')
-            .addClass('image-search btn btn-default')
-            .attr('style', 'float: right')
-            .attr('target', '_blank')
-            .text('Images');
+        var $imageLinks = this.searchLinks(item);
+
         var $species = $('<div/>')
             .addClass('panel-heading')
             .append($('<h5/>')
                     .attr('style', 'float: left')
                     .text('Species: ' + item.name))
-            .append($imageLink)
-            .append($('<div/>').attr('style', 'clear: both'))
-        ;
+            .append($('<div/>')
+                    .attr('style', 'float: right')
+                    .append($imageLinks))
+            .append($('<div/>').attr('style', 'clear: both'));
+
         var $identificationList = $('<ul>').addClass('identification list-group');
         $.each(item.identification, function(index, value) {
             $identificationList.append(
@@ -1107,7 +1190,7 @@ class TreeTable {
 
         var self = this;
 
-        $imageLink.on('click', function(event) {
+        $imageLinks.on('click', function(event) {
             event.stopPropagation();
         });
 
