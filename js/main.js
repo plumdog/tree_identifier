@@ -94,7 +94,7 @@ class Identifier {
         this.pointDelta = pointDelta;
         this.fullName = fullName || utils.capitalize(this.name);
         this.slugName = slugName || this.fullName.replace(new RegExp(' ', 'g'), '_').toLowerCase();
-        this.searchTermFn = searchTermFn || null;
+        this.searchTermFn = searchTermFn;
     }
 
     optionIsValid(option) {
@@ -166,8 +166,7 @@ class Dependency {
         var depSatisfied = null;
 
         $.each(identifiersAndValues, function(index2, selectedIdentifierAndValue) {
-            var selectedIdentifier = selectedIdentifierAndValue[0];
-            var selectedValue = selectedIdentifierAndValue[1];
+            var [selectedIdentifier, selectedValue] = selectedIdentifierAndValue;
 
             if (!Object.is(selectedIdentifier, depIdentifier)) {
                 return true;
@@ -1098,7 +1097,7 @@ var trees = [
         .id(compound, 'simple')
         .id(lobed, false)
         .id(shape, 'round')
-        .id(leafToothed, 'medium')
+        .id(leafToothed, 'small')
         .id(leafTipShape, 'abrupt')
         .id(veryHairy, true)
         .id(barkColour, 'greyBrown'),
@@ -1412,8 +1411,7 @@ class MatchedItem {
         var self = this;
         var scores = [];
         $.each(this.identifiersAndValues, function(index, identifierAndValue) {
-            var identifier = identifierAndValue[0];
-            var value = identifierAndValue[1];
+            var [identifier, value] = identifierAndValue;
             var score = self._itemMatchScore(identifier, value);
             scores.push(score);
         });
