@@ -135,21 +135,16 @@ class Identifier {
     }
 
     static bool(args) {
-        var {category, name, depends} = args;
-
-        return new Identifier({
-            category: category,
-            name: name,
-            options: {
-                true: {
-                    name: 'Yes'
-                },
-                false: {
-                    name: 'No'
-                }
+        args.options = {
+            true: {
+                name: 'Yes'
             },
-            depends: depends || []
-        });
+            false: {
+                name: 'No'
+            }
+        };
+
+        return new Identifier(args);
     }
 }
 
@@ -224,6 +219,25 @@ var leafType = new Identifier({
     }
 });
 
+var cones = Identifier.bool({
+    category: 'Cone',
+    name: 'Cone',
+    depends: [
+        new Dependency({
+            identifier: leafType,
+            option: 'needles'
+        })
+    ],
+    searchTermFn: function(option, item) {
+        if (option === true) {
+            return {
+                name: 'Cone images',
+                termSuffix: 'cones'
+            }
+        }
+    }
+});
+
 var coneShape = new Identifier({
     category: 'Cone',
     name: 'Cone shape',
@@ -233,8 +247,8 @@ var coneShape = new Identifier({
     },
     depends: [
         new Dependency({
-            identifier: leafType,
-            option: 'needles'
+            identifier: cones,
+            option: true
         })
     ]
     
@@ -785,9 +799,11 @@ class BoundIdentifier {
             var identifierSearchTerm = this.identifier.searchTermFn(this.option, item);
             var term = (identifierSearchTerm.term
                         || item.defaultSearchTerm + ' ' + identifierSearchTerm.termSuffix);
-            return {
-                name: identifierSearchTerm.name,
-                term: term
+            if (identifierSearchTerm.name && term) {
+                return {
+                    name: identifierSearchTerm.name,
+                    term: term
+                }
             }
         }
     }
@@ -866,6 +882,7 @@ var trees = [
     new Item('Scots Pine')
         .id(leafType, 'needles')
         .id(needlePairsThreeOrFive, true)
+        .id(cones, true)
         .id(barkColour, 'orangeBrown'),
     new Item('Lodgepole Pine')
         .id(leafType, 'needles')
@@ -874,11 +891,13 @@ var trees = [
     new Item('Cedar')
         .id(leafType, 'needles')
         .id(twigSideShoots, true)
+        .id(cones, true)
         .id(coneShape, 'barrel')
         .id(barkColour, 'blackBrown'),
     new Item('Larch')
         .id(leafType, 'needles')
         .id(twigSideShoots, true)
+        .id(cones, true)
         .id(coneShape, 'egg')
         .id(barkColour, 'greyBrown'),
     new Item('Firs')
@@ -911,6 +930,7 @@ var trees = [
         .id(leafType, 'needles')
         .id(twigSideShoots, false)
         .id(suckerBase, false)
+        .id(cones, true)
         .id(pegLeftWhenRemoved, false)
         .id(needlesAllDirections, false)
         .id(needlesUndersideTwoWhiteLines, false)
