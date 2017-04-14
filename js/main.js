@@ -814,7 +814,8 @@ class Item {
 
         searches.push({
             name: 'Images',
-            term: this.defaultSearchTerm
+            term: this.defaultSearchTerm,
+            defaultSearch: true
         });
 
         return searches;
@@ -1144,6 +1145,12 @@ class TreeTable {
 
             var $link = self.searchLinkElement(value, name);
 
+            if (!nameAndValue.defaultSearch) {
+                $link.addClass('hidden-xs not-default-search')
+            } else {
+                $link.addClass('default-search')
+            }
+
             $imageLinks = $imageLinks.add($link);
         });
         return $imageLinks;
@@ -1200,6 +1207,12 @@ class TreeTable {
             var $selected = self.$table.find('div.panel-primary');
             if ($selected.length > 2) {
                 $selected.not($rowDiv).removeClass('panel-primary');
+            }
+
+            if ($rowDiv.hasClass('panel-primary')) {
+                $rowDiv.find('.not-default-search.hidden-xs').removeClass('hidden-xs');
+            } else {
+                $rowDiv.find('.not-default-search').addClass('hidden-xs');
             }
 
             $selected = self.$table.find('div.panel-primary');
