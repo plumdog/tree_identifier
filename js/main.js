@@ -79,9 +79,64 @@ var utils = {
     }
 };
 
+class IdentifierInfo {
+    constructor(identifier) {
+        this.identifier = identifier;
+    }
+
+    getElement() {
+        var $info = null;
+
+        if (this.identifier.help) {
+            $info = $('<a/>')
+                .attr('href', '#')
+                .addClass('btn')
+                .append(
+                    $('<span/>')
+                        .addClass('glyphicon glyphicon-info-sign'));
+            $info.on('click', function() {
+                var self = $(this);
+                var inputIdentifier = self
+                    .closest('.form-group')
+                    .find('select')
+                    .data('identifier');
+
+                var $modalDiv = $('#modal-info');
+                $modalDiv.find('.modal-title').text(inputIdentifier.name);
+                var $modalBody = $modalDiv.find('.modal-body');
+                $modalBody.empty()
+
+                $modalBody
+                    .append($('<p/>').text(inputIdentifier.help))
+                    .append($('<h3/>').text('Options'));
+
+                var $optionsList = $('<ul/>');
+                var $optionInfo;
+                var optionText;
+                $.each(inputIdentifier.options, function(option, info) {
+                    $optionInfo = $('<li/>');
+                    optionText = inputIdentifier.optionName(option);
+                    if (info.help) {
+                        optionText += ' - ' + info.help;
+                    }
+                    $optionInfo.text(optionText);
+                    $optionsList.append($optionInfo);
+                });
+
+                $modalBody.append($optionsList);
+
+                $modalDiv.modal();
+                return false;
+            });
+        }
+        return $info;
+    }
+}
+
+
 class Identifier {
     constructor(args) {
-        var {category, name, options, depends, pointDelta, fullName, slugName, searchTermFn} = args;
+        var {category, name, options, depends, pointDelta, fullName, slugName, searchTermFn, help} = args;
         this.category = category || 'Other';
         this.name = name;
         this.options = options;
@@ -95,6 +150,9 @@ class Identifier {
         this.fullName = fullName || utils.capitalize(this.name);
         this.slugName = slugName || this.fullName.replace(new RegExp(' ', 'g'), '_').toLowerCase();
         this.searchTermFn = searchTermFn;
+        this.help = help;
+
+        this.info = new IdentifierInfo(this);
     }
 
     optionIsValid(option) {
@@ -575,6 +633,7 @@ var barkColour = new Identifier({
     category: 'Bark',
     name: 'Colour',
     fullName: 'Bark colour',
+    help: 'What colour is the bark of the main trunk of the tree?',
     // TODO: consider making this a 2D metric
     options: {
         white: {
@@ -1535,6 +1594,7 @@ class Finder {
     }
 }
 
+
 class FinderForm {
     constructor(identifiers, callback) {
         this.identifiers = identifiers;
@@ -1572,7 +1632,14 @@ class FinderForm {
                         var $row = $('<div/>').addClass('form-group row');
                         $row.append(self.getLabel(identifier));
                         var $input = self.getInput(identifier);
-                        $row.append($('<div/>').addClass('col-xs-6').append($input));
+                        var $info = identifier.info.getElement();
+
+                        $row.append($('<div/>').addClass('col-xs-5').append($input));
+
+                        if ($info) {
+                            $row.append($('<div/>').addClass('col-xs-1').append($info));
+                        }
+
                         self.inputs.push($input);
                         $rowsDiv.append($row);
                     },

@@ -21,24 +21,23 @@ var id2 = new Identifier({
     }
 });
 
-
-QUnit.test('Match beats non-match', function(assert) {
-    var item1 = new Item('item1')
-        .id(id1, 'id1a');
-    var item2 = new Item('item2')
-        .id(id1, 'id1b')
-
-    var selected = [
-        [id1, 'id1a']
-    ];
-    var matched1 = new MatchedItem(item1, selected);
-    var matched2 = new MatchedItem(item2, selected);
-
-    assert.ok(matched1.getScore() > matched2.getScore());
+var id3 = new Identifier({
+    name: 'id3',
+    options: {
+        id3a: {
+            point: 0.0
+        },
+        id3b: {
+            point: 0.5
+        },
+        id3c: {
+            point: 1.0
+        }
+    }
 });
 
 
-QUnit.test('Match beats ', function(assert) {
+QUnit.test('Match beats non-match', function(assert) {
     var item1 = new Item('item1')
         .id(id1, 'id1a');
     var item2 = new Item('item2')
