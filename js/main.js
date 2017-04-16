@@ -404,13 +404,20 @@ var lobed = Identifier.bool({
     ]
 });
 
-var asymmetricalBase = Identifier.bool({
+var leafBaseShape = new Identifier({
     category: 'Leaf Shape',
-    name: 'Asymmetrical base',
-    fullName: 'Asymmetrical leaf base',
+    name: 'Base shape',
+    fullName: 'Leaf base shape',
+    options: {
+        asymmetric: {},
+        heart: {
+            name: 'Heart-shaped'
+        }
+    },
     depends: [
         leafType.dependency({
-            option: 'broad'
+            option: 'broad',
+            hard: true
         })
     ]
 });
@@ -429,8 +436,6 @@ var lobedRibs = new Identifier({
         })
     ]
 });
-
-
 var twigSideShoots = Identifier.bool({
     category: 'Twig',
     name: 'Twig side shoots',
@@ -658,16 +663,6 @@ var glossyDarkGreenAbove = Identifier.bool({
 var whiteHairsBeneath = Identifier.bool({
     category: 'Leaf Hairs',
     name: 'White hairs beneath',
-    depends: [
-        leafType.dependency({
-            option: 'broad'
-        })
-    ]
-});
-
-var heartShaped = Identifier.bool({
-    category: 'Leaf Shape',
-    name: 'Heart shaped',
     depends: [
         leafType.dependency({
             option: 'broad'
@@ -1063,7 +1058,7 @@ var trees = [
         .id(shape, 'round')
         .id(leafToothed, 'medium')
         .id(leafTipShape, 'abrupt')
-        .id(heartShaped, true)
+        .id(leafBaseShape, 'heart')
         .id(darkGreenAbove, true)
         .id(paleGreenBeneath, true)
         .id(barkColour, 'greyBrown'),
@@ -1108,7 +1103,7 @@ var trees = [
         .id(lobed, false)
         .id(shape, 'round')
         .id(leafToothed, 'medium')
-        .id(asymmetricalBase, true),
+        .id(leafBaseShape, 'asymmetric'),
     new Item('Common Alder')
         .id(leafType, 'broad')
         .id(compound, 'simple')
