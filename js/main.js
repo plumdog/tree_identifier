@@ -250,7 +250,8 @@ var coneShape = new Identifier({
     },
     depends: [
         cones.dependency({
-            option: true
+            option: true,
+            hard: true
         })
     ]
     
@@ -265,7 +266,13 @@ var leafColour = new Identifier({
             name: "Dark green"
         },
         shiny: {}
-    }
+    },
+    depends: [
+        leafType.dependency({
+            option: 'broad',
+            hard: true
+        })
+    ]
 });
 
 var leafToothed = new Identifier({
@@ -282,7 +289,8 @@ var leafToothed = new Identifier({
     },
     depends: [
         leafType.dependency({
-            option: 'broad'
+            option: 'broad',
+            hard: true
         })
     ]
 });
@@ -301,7 +309,8 @@ var compound = new Identifier({
     },
     depends: [
         leafType.dependency({
-            option: 'broad'
+            option: 'broad',
+            hard: true
         })
     ]
 });
@@ -321,7 +330,8 @@ var shape = new Identifier({
     },
     depends: [
         leafType.dependency({
-            option: 'broad'
+            option: 'broad',
+            hard: true
         })
     ]
 });
@@ -338,8 +348,13 @@ var length = new Identifier({
         }
     },
     depends: [
+        shape.dependency({
+            option: 'longThin',
+            hard: true
+        }),
         leafType.dependency({
-            option: 'broad'
+            option: 'broad',
+            hard: true
         })
     ]
 });
@@ -354,7 +369,8 @@ var leafTipShape = new Identifier({
     },
     depends: [
         leafType.dependency({
-            option: 'broad'
+            option: 'broad',
+            hard: true
         })
     ]
 });
@@ -399,7 +415,8 @@ var lobed = Identifier.bool({
     fullName: 'Leaf lobed',
     depends: [
         leafType.dependency({
-            option: 'broad'
+            option: 'broad',
+            hard: true
         })
     ]
 });
@@ -432,7 +449,8 @@ var lobedRibs = new Identifier({
     },
     depends: [
         lobed.dependency({
-            option: true
+            option: true,
+            hard: true
         })
     ]
 });
@@ -501,7 +519,8 @@ var sharpWhiteBand = Identifier.bool({
     name: 'Sharp white band',
     depends: [
         leafType.dependency({
-            option: 'needles'
+            option: 'needles',
+            hard: true
         })
     ]
 });
@@ -641,44 +660,71 @@ var twigsShinyDarkBrown = Identifier.bool({
 });
 var darkGreenAbove = Identifier.bool({
     category: 'Leaf Colour',
-    name: 'Dark green above'
+    name: 'Dark green above',
+    depends: [
+        leafType.dependency({
+            option: 'broad',
+            hard: true
+        })
+    ]
 });
 var whiteWoolyAbove = Identifier.bool({
-    category: 'Leaf Hairs',
+    category: 'Leaf Texture',
     name: 'White wooly above',
     depends: [
         leafType.dependency({
-            option: 'broad'
+            option: 'broad',
+            hard: true
         })
     ]
 });
 var budAtBaseShortStalk = Identifier.bool({
     category: 'Leaf Stalk',
-    name: 'Bud at base short stalk'
+    name: 'Bud at base short stalk',
+    depends: [
+        leafType.dependency({
+            option: 'broad',
+            hard: true
+        })
+    ]
 })
 var glossyDarkGreenAbove = Identifier.bool({
     category: 'Leaf Colour',
-    name: 'Glossy dark green above'
+    name: 'Glossy dark green above',
+    depends: [
+        leafType.dependency({
+            option: 'broad',
+            hard: true
+        })
+    ]
 });
 var whiteHairsBeneath = Identifier.bool({
-    category: 'Leaf Hairs',
+    category: 'Leaf Texture',
     name: 'White hairs beneath',
     depends: [
         leafType.dependency({
-            option: 'broad'
+            option: 'broad',
+            hard: true
         })
     ]
 });
 var paleGreenBeneath = Identifier.bool({
     category: 'Leaf Colour',
-    name: 'Pale green beneath'
+    name: 'Pale green beneath',
+    depends: [
+        leafType.dependency({
+            option: 'broad',
+            hard: true
+        })
+    ]
 });
 var veryHairy = Identifier.bool({
-    category: 'Leaf Hairs',
+    category: 'Leaf Texture',
     name: 'Very hairy',
     depends: [
         leafType.dependency({
-            option: 'broad'
+            option: 'broad',
+            hard: true
         })
     ]
 });
@@ -694,14 +740,21 @@ var smooth = Identifier.bool({
 });
 var stalkWhiteHairs = Identifier.bool({
     category: 'Leaf Stalk',
-    name: 'Stalk white hairs'
+    name: 'Stalk white hairs',
+    depends: [
+        leafType.dependency({
+            option: 'broad',
+            hard: true
+        })
+    ]
 });
 var softlyHairy = Identifier.bool({
-    category: 'Leaf Hairs',
+    category: 'Leaf Texture',
     name: 'Softly hairy',
     depends: [
         leafType.dependency({
-            option: 'broad'
+            option: 'broad',
+            hard: true
         })
     ]
 });
@@ -720,7 +773,8 @@ var wavyEdge = Identifier.bool({
     name: 'Wavy edge',
     depends: [
         leafType.dependency({
-            option: 'broad'
+            option: 'broad',
+            hard: true
         })
     ]
 });
@@ -1606,6 +1660,8 @@ class FinderForm {
         $.each(this.inputs, function(i, $input) {
             $input.val('');
         });
+        this.hideFields([]);
+        this.$form.find('.inner').hide();
     }
 }
 
