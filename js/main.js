@@ -270,12 +270,14 @@ var leafType = new Identifier({
         if (option === 'needles') {
             return {
                 name: 'Needle images',
-                termSuffix: 'needles'
+                termSuffix: 'needles',
+                type: 'images'
             }
         } else if ((option === 'scales') || (option === 'broad')) {
             return {
                 name: 'Leaf Images',
-                termSuffix: 'leaves'
+                termSuffix: 'leaves',
+                type: 'images'
             }
         }
     }
@@ -293,7 +295,8 @@ var cones = Identifier.bool({
         if (option === true) {
             return {
                 name: 'Cone images',
-                termSuffix: 'cones'
+                termSuffix: 'cones',
+                type: 'images'
             }
         }
     }
@@ -702,7 +705,8 @@ var barkColour = new Identifier({
     searchTermFn: function(option, item) {
         return {
             name: 'Bark images',
-            termSuffix: 'bark'
+            termSuffix: 'bark',
+            type: 'images'
         }
     }
 });
@@ -895,7 +899,8 @@ class BoundIdentifier {
             if (identifierSearchTerm.name && term) {
                 return {
                     name: identifierSearchTerm.name,
-                    term: term
+                    term: term,
+                    type: identifierSearchTerm.type
                 }
             }
         }
@@ -944,6 +949,12 @@ class Item {
     searchTerms() {
         var searches = [];
 
+        searches.push({
+            name: 'Search',
+            term: this.defaultSearchTerm,
+            defaultSearch: true
+        });
+
         var searchTerm;
         var self = this;
         $.each(this.identification, function(i, boundIdentifier) {
@@ -956,6 +967,8 @@ class Item {
         searches.push({
             name: 'Images',
             term: this.defaultSearchTerm,
+            defaultSearch: true,
+            type: 'images',
             defaultSearch: true
         });
 
@@ -1303,25 +1316,27 @@ class TreeTable {
         });
     }
 
-    searchLinkElement(term, text) {
-        var $imageLink = $('<a/>')
-            .attr('href', 'https://www.google.com/search?tbm=isch&q=' + term)
+    searchLinkElement(searchConfig) {
+        var url = 'https://www.google.com/search?'
+        if (searchConfig.type === 'images') {
+            url += 'tbm=isch&';
+        }
+        url += 'q=' + searchConfig.term;
+
+        return $('<a/>')
+            .attr('href', url)
             .addClass('item-search btn btn-default')
             .attr('target', '_blank')
-            .text(text);
-        return $imageLink;
+            .text(searchConfig.name);
     }
 
     searchLinks(item) {
         var $imageLinks = $();
         var self = this;
-        $.each(item.searchTerms(), function(i, nameAndValue) {
-            var name = nameAndValue.name;
-            var value = nameAndValue.term;
+        $.each(item.searchTerms(), function(i, searchConfig) {
+            var $link = self.searchLinkElement(searchConfig);
 
-            var $link = self.searchLinkElement(value, name);
-
-            if (!nameAndValue.defaultSearch) {
+            if (!searchConfig.defaultSearch) {
                 $link.addClass('hidden-xs not-default-search')
             } else {
                 $link.addClass('default-search')
@@ -1341,14 +1356,10 @@ class TreeTable {
         var $rowDiv = $('<div/>').addClass('panel panel-default');
         var $imageLinks = this.searchLinks(item);
 
-        var $imageLinkDivs = $();
-        $imageLinks.each(function() {
-            $imageLinkDivs = $imageLinkDivs.add(
-                $('<div/>')
-                    .addClass('btn-group')
-                    .attr('role', 'group')
-                    .append($(this)));
-        });
+        var $imageLinksDiv = $('<div/>')
+            .addClass('btn-group')
+            .attr('role', 'group')
+            .append($imageLinks);
 
         var $species = $('<div/>')
             .addClass('panel-heading')
@@ -1358,7 +1369,7 @@ class TreeTable {
             .append($('<div/>')
                     .attr('style', 'float: right')
                     .addClass('btn-toolbar')
-                    .append($imageLinkDivs))
+                    .append($imageLinksDiv))
             .append($('<div/>').attr('style', 'clear: both'));
 
         var $identificationList = $('<ul>').addClass('identification list-group');
