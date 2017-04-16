@@ -429,6 +429,16 @@ var leafBaseShape = new Identifier({
         asymmetric: {},
         heart: {
             name: 'Heart-shaped'
+        },
+        vShaped: {
+            name: 'V-shaped'
+        },
+        vShapedInward: {
+            name: 'Inward v-shaped'
+        },
+        rounded: {},
+        flatAndWide: {
+            name: 'Flat and wide'
         }
     },
     depends: [
@@ -970,26 +980,30 @@ var trees = [
     new Item('Horse Chestnut')
         .id(leafType, 'broad')
         .id(compound, 'compoundFiveEndOfStalk')
-        .id(barkColour, 'pinkGrey'),
+        .id(barkColour, 'pinkGrey')
+        .id(leafBaseShape, 'vShaped'),
     new Item('Elder')
         .id(leafType, 'broad')
         .id(compound, 'compoundPairs')
         .id(leafletNumber, 'twoOrThree')
         .id(leafletPairsArrangement, 'symmetric')
-        .id(barkColour, 'greyBrown'),
+        .id(barkColour, 'greyBrown')
+        .id(leafBaseShape, 'vShaped'),
     new Item('Ash')
         .id(leafType, 'broad')
         .id(compound, 'compoundPairs')
         .id(leafletNumber, 'manyPairs')
         .id(leafletPairsArrangement, 'symmetric')
         .id(barkColour, 'grey')
-        .id(shape, 'longThin'),
+        .id(shape, 'longThin')
+        .id(leafBaseShape, 'vShaped'),
     new Item('Rowan')
         .id(leafType, 'broad')
         .id(compound, 'compoundPairs')
         .id(leafletNumber, 'manyPairs')
         .id(leafletPairsArrangement, 'alternate')
-        .id(barkColour, 'grey'),
+        .id(barkColour, 'grey')
+        .id(leafBaseShape, 'rounded'),
     new Item('Sycamore')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -997,7 +1011,8 @@ var trees = [
         .id(lobedEdgeShape, 'toothed')
         .id(lobedRibs, 'radial')
         .id(leafToothed, 'medium')
-        .id(barkColour, 'pinkGrey'),
+        .id(barkColour, 'pinkGrey')
+        .id(leafBaseShape, 'vShapedInward'),
     new Item('Field Maple')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1005,7 +1020,8 @@ var trees = [
         .id(lobedEdgeShape, 'blunt')
         .id(lobedRibs, 'radial')
         .id(leafToothed, 'none')
-        .id(barkColour, 'lightBrown'),
+        .id(barkColour, 'lightBrown')
+        .id(leafBaseShape, 'vShapedInward'),
     // idBool('symmetricPairs') true),  // ?
     new Item('London Plane')
         .id(leafType, 'broad')
@@ -1014,7 +1030,8 @@ var trees = [
         .id(lobedEdgeShape, 'sharp')
         .id(lobedRibs, 'radial')
         .id(leafToothed, 'none')
-        .id(barkColour, 'greenGrey'),
+        .id(barkColour, 'greenGrey')
+        .id(leafBaseShape, 'flatAndWide'),
     // idBool('alternatePairs') true),
     new Item('Oak')
         .id(leafType, 'broad')
@@ -1023,7 +1040,8 @@ var trees = [
         .id(lobedEdgeShape, 'rounded')
         .id(lobedRibs, 'spinal')
         .id(lobesThreeToEight, true)
-        .id(barkColour, 'greyBrown'),
+        .id(barkColour, 'greyBrown')
+        .id(leafBaseShape, 'vShaped'),
     new Item('Hawthorn')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1031,7 +1049,8 @@ var trees = [
         .id(lobedRibs, 'spinal')
         .id(lobesThreeToEight, false)
         .id(lobedEdgeShape, 'thorny')
-        .id(barkColour, 'greyBrown'),
+        .id(barkColour, 'greyBrown')
+        .id(leafBaseShape, 'vShaped'),
     new Item('Wild Service Tree', {defaultSearchSuffix: ''})
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1039,7 +1058,8 @@ var trees = [
         .id(lobedRibs, 'spinal')
         .id(lobesThreeToEight, false)
         .id(lobedEdgeShape, 'toothed')
-        .id(barkColour, 'brown'),
+        .id(barkColour, 'brown')
+        .id(leafBaseShape, 'flatAndWide'),
     new Item('Willow')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1047,7 +1067,8 @@ var trees = [
         .id(shape, 'longThin')
         .id(length, 'moreThan10cm')
         .id(leafToothed, 'minute')
-        .id(barkColour, 'brown'),
+        .id(barkColour, 'brown')
+        .id(leafBaseShape, 'vShaped'),
     new Item('Sweet Chestnut')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1055,7 +1076,8 @@ var trees = [
         .id(shape, 'longThin')
         .id(length, 'moreThan10cm')
         .id(leafToothed, 'large')
-        .id(barkColour, 'purpleGrey'),
+        .id(barkColour, 'purpleGrey')
+        .id(leafBaseShape, 'rounded'),
     new Item('Hornbeam')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1063,7 +1085,8 @@ var trees = [
         .id(shape, 'longThin')
         .id(length, 'lessThan10cm')
         .id(leafToothed, 'double')
-        .id(barkColour, 'grey'),
+        .id(barkColour, 'grey')
+        .id(leafBaseShape, 'rounded'),
     new Item('Bird Cherry')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1072,7 +1095,8 @@ var trees = [
         .id(length, 'lessThan10cm')
         .id(twigsShinyDarkBrown, true)
         .id(leafToothed, 'small')
-        .id(barkColour, 'greyBrown'),
+        .id(barkColour, 'greyBrown')
+        .id(leafBaseShape, 'vShaped'),
     new Item('Holm Oak')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1081,7 +1105,8 @@ var trees = [
         .id(leafToothed, 'medium')
         .id(darkGreenAbove, true)
         .id(whiteWoolyAbove, true)
-        .id(barkColour, 'blackBrown'),
+        .id(barkColour, 'blackBrown')
+        .id(leafBaseShape, 'rounded'),
     //stemColour: 'grey-brown')
     //stemHairs: 'short pale-brown'
     new Item('Crab Apple')
@@ -1093,7 +1118,8 @@ var trees = [
         .id(darkGreenAbove, true)
         .id(whiteWoolyAbove, true)
         .id(budAtBaseShortStalk, true)
-        .id(barkColour, 'greyBrown'),
+        .id(barkColour, 'greyBrown')
+        .id(leafBaseShape, 'rounded'),
     new Item('Whitebeam')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1104,7 +1130,8 @@ var trees = [
         .id(whiteWoolyAbove, true)
         .id(glossyDarkGreenAbove, true)
         .id(whiteHairsBeneath, true)
-        .id(barkColour, 'grey'),
+        .id(barkColour, 'grey')
+        .id(leafBaseShape, 'rounded'),
     new Item('Lime')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1124,7 +1151,8 @@ var trees = [
         .id(leafToothed, 'small')
         .id(leafTipShape, 'abrupt')
         .id(veryHairy, true)
-        .id(barkColour, 'greyBrown'),
+        .id(barkColour, 'greyBrown')
+        .id(leafBaseShape, 'vShapedInward'),
     new Item('Poplar')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1133,7 +1161,8 @@ var trees = [
         .id(leafToothed, 'medium')
         .id(leafTipShape, 'abrupt')
         .id(smooth, true)
-        .id(barkColour, 'paleGrey'),
+        .id(barkColour, 'paleGrey')
+        .id(leafBaseShape, 'flatAndWide'),
     new Item('Silver Birch')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1141,7 +1170,8 @@ var trees = [
         .id(shape, 'round')
         .id(leafToothed, 'medium')
         .id(leafTipShape, 'tapered')
-        .id(barkColour, 'white'),
+        .id(barkColour, 'white')
+        .id(leafBaseShape, 'flatAndWide'),
     new Item('Downy Birch')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1150,7 +1180,8 @@ var trees = [
         .id(leafToothed, 'medium')
         .id(leafTipShape, 'tapered')
         .id(stalkWhiteHairs, true)
-        .id(barkColour, 'paleGrey'),
+        .id(barkColour, 'paleGrey')
+        .id(leafBaseShape, 'vShaped'),
     new Item('Elm')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1166,7 +1197,8 @@ var trees = [
         .id(leafToothed, 'none')
         .id(leafTipShape, 'blunt')
         .id(leafColour, 'darkGreen')
-        .id(barkColour, 'darkBrown'),
+        .id(barkColour, 'darkBrown')
+        .id(leafBaseShape, 'rounded'),
     new Item('Goat Willow')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1175,7 +1207,8 @@ var trees = [
         .id(leafToothed, 'none')
         .id(softlyHairy, true)
         .id(veins, true)
-        .id(barkColour, 'greyBrown'),
+        .id(barkColour, 'greyBrown')
+        .id(leafBaseShape, 'vShaped'),
     new Item('Beech')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1185,6 +1218,7 @@ var trees = [
         .id(leafColour, 'shiny')
         .id(wavyEdge, true)
         .id(barkColour, 'grey')
+        .id(leafBaseShape, 'vShaped')
 ];
 
 
