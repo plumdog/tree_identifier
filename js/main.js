@@ -1695,7 +1695,7 @@ class FinderForm {
             $input.val('');
         });
         this.hideFields([]);
-        this.$form.find('.inner').hide();
+        this.$form.find('.inner').addClass('hide');
     }
 }
 
