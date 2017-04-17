@@ -1016,7 +1016,7 @@ var trees = [
         .id(cones, true)
         .id(coneShape, 'egg')
         .id(barkColour, 'greyBrown'),
-    new Item('Firs')
+    new Item('Fir')
         .id(leafType, 'needles')
         .id(twigSideShoots, false)
         .id(suckerBase, true)
