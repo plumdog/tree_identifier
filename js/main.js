@@ -1272,7 +1272,8 @@ var trees = [
         .id(lobed, false)
         .id(shape, 'round')
         .id(leafToothed, 'medium')
-        .id(leafBaseShape, 'asymmetric'),
+        .id(leafBaseShape, 'asymmetric')
+        .id(barkColour, 'greyBrown'),
     new Item('Common Alder')
         .id(leafType, 'broad')
         .id(compound, 'simple')
