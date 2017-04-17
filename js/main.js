@@ -326,11 +326,61 @@ var leafColour = new Identifier({
         darkGreen: {
             name: "Dark green"
         },
-        shiny: {}
     },
     depends: [
         leafType.dependency({
             option: 'broad',
+            hard: true
+        })
+    ]
+});
+var leafColourBeneath = new Identifier({
+    category: 'Leaf Colour',
+    name: 'Colour underneath',
+    fullName: 'Leaf colour underneath',
+    options: {
+        paleGreen: {
+            name: "Pale green"
+        },
+    },
+    depends: [
+        leafType.dependency({
+            option: 'broad',
+            hard: true
+        })
+    ]
+});
+var leafAppearance = new Identifier({
+    category: 'Leaf Colour',
+    name: 'Appearance',
+    fullName: 'Leaf appearance',
+    options: {
+        shiny: {},
+    },
+    depends: [
+        leafType.dependency({
+            option: 'broad',
+            hard: true
+        })
+    ]
+});
+
+var needlesUndersideTwoWhiteLines = Identifier.bool({
+    category: 'Leaf Colour',
+    name: 'Needles underside two white lines',
+    depends: [
+        leafType.dependency({
+            option: 'needles',
+            hard: true
+        })
+    ]
+});
+var sharpWhiteBand = Identifier.bool({
+    category: 'Leaf Colour',
+    name: 'Sharp white band',
+    depends: [
+        leafType.dependency({
+            option: 'needles',
             hard: true
         })
     ]
@@ -565,16 +615,6 @@ var needlesAllDirections = Identifier.bool({
         })
     ]
 });
-var needlesUndersideTwoWhiteLines = Identifier.bool({
-    category: 'Leaf Colour',
-    name: 'Needles underside two white lines',
-    depends: [
-        leafType.dependency({
-            option: 'needles',
-            hard: true
-        })
-    ]
-});
 var pineappleSmell = Identifier.bool({
     category: 'Leaf Smell',
     name: 'Pineapple smell when leaves crushed',
@@ -585,16 +625,7 @@ var pineappleSmell = Identifier.bool({
         })
     ]
 });
-var sharpWhiteBand = Identifier.bool({
-    category: 'Leaf Colour',
-    name: 'Sharp white band',
-    depends: [
-        leafType.dependency({
-            option: 'needles',
-            hard: true
-        })
-    ]
-});
+
 var needlePairsThreeOrFive = Identifier.bool({
     category: 'Leaf Arrangement',
     name: 'Needle pairs - three or five',
@@ -731,16 +762,6 @@ var twigsShinyDarkBrown = Identifier.bool({
         })
     ]
 });
-var darkGreenAbove = Identifier.bool({
-    category: 'Leaf Colour',
-    name: 'Dark green above',
-    depends: [
-        leafType.dependency({
-            option: 'broad',
-            hard: true
-        })
-    ]
-});
 var whiteWoolyAbove = Identifier.bool({
     category: 'Leaf Texture',
     name: 'White wooly above',
@@ -761,16 +782,6 @@ var budAtBaseShortStalk = Identifier.bool({
         })
     ]
 })
-var glossyDarkGreenAbove = Identifier.bool({
-    category: 'Leaf Colour',
-    name: 'Glossy dark green above',
-    depends: [
-        leafType.dependency({
-            option: 'broad',
-            hard: true
-        })
-    ]
-});
 var whiteHairsBeneath = Identifier.bool({
     category: 'Leaf Texture',
     name: 'White hairs beneath',
@@ -781,16 +792,7 @@ var whiteHairsBeneath = Identifier.bool({
         })
     ]
 });
-var paleGreenBeneath = Identifier.bool({
-    category: 'Leaf Colour',
-    name: 'Pale green beneath',
-    depends: [
-        leafType.dependency({
-            option: 'broad',
-            hard: true
-        })
-    ]
-});
+
 var veryHairy = Identifier.bool({
     category: 'Leaf Texture',
     name: 'Very hairy',
@@ -1084,7 +1086,8 @@ var trees = [
         .id(lobedRibs, 'radial')
         .id(leafToothed, 'medium')
         .id(barkColour, 'pinkGrey')
-        .id(leafBaseShape, 'vShapedInward'),
+        .id(leafBaseShape, 'vShapedInward')
+        .id(leafColour, 'darkGreen'),
     new Item('Field Maple')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1149,7 +1152,8 @@ var trees = [
         .id(length, 'moreThan10cm')
         .id(leafToothed, 'large')
         .id(barkColour, 'purpleGrey')
-        .id(leafBaseShape, 'rounded'),
+        .id(leafBaseShape, 'rounded')
+        .id(leafColour, 'darkGreen'),
     new Item('Hornbeam')
         .id(leafType, 'broad')
         .id(compound, 'simple')
@@ -1175,7 +1179,7 @@ var trees = [
         .id(lobed, false)
         .id(shape, 'round')
         .id(leafToothed, 'medium')
-        .id(darkGreenAbove, true)
+        .id(leafColour, 'darkGreen')
         .id(whiteWoolyAbove, true)
         .id(barkColour, 'blackBrown')
         .id(leafBaseShape, 'rounded'),
@@ -1187,7 +1191,7 @@ var trees = [
         .id(lobed, false)
         .id(shape, 'round')
         .id(leafToothed, 'medium')
-        .id(darkGreenAbove, true)
+        .id(leafColour, 'darkGreen')
         .id(whiteWoolyAbove, true)
         .id(budAtBaseShortStalk, true)
         .id(barkColour, 'greyBrown')
@@ -1198,9 +1202,9 @@ var trees = [
         .id(lobed, false)
         .id(shape, 'round')
         .id(leafToothed, 'medium')
-        .id(darkGreenAbove, true)
+        .id(leafColour, 'darkGreen')
+        .id(leafAppearance, 'shiny')
         .id(whiteWoolyAbove, true)
-        .id(glossyDarkGreenAbove, true)
         .id(whiteHairsBeneath, true)
         .id(barkColour, 'grey')
         .id(leafBaseShape, 'rounded'),
@@ -1212,8 +1216,8 @@ var trees = [
         .id(leafToothed, 'medium')
         .id(leafTipShape, 'abrupt')
         .id(leafBaseShape, 'heart')
-        .id(darkGreenAbove, true)
-        .id(paleGreenBeneath, true)
+        .id(leafColour, 'darkGreen')
+        .id(leafColourBeneath, 'paleGreen')
         .id(barkColour, 'greyBrown'),
     new Item('Hazel')
         .id(leafType, 'broad')
@@ -1287,7 +1291,7 @@ var trees = [
         .id(lobed, false)
         .id(shape, 'round')
         .id(leafToothed, 'none')
-        .id(leafColour, 'shiny')
+        .id(leafAppearance, 'shiny')
         .id(wavyEdge, true)
         .id(barkColour, 'grey')
         .id(leafBaseShape, 'vShaped')
