@@ -538,26 +538,26 @@ var leafBaseShape = new Identifier({
     fullName: 'Leaf base shape',
     options: {
         asymmetric: {
-            point: 0.0
+            point: 0.0,
         },
         vShaped: {
             name: 'V-shaped',
-            point: 1.5
+            point: 1.5,
         },
         rounded: {
-            point: 2.0
+            point: 2.0,
         },
         flatAndWide: {
             name: 'Flat and wide',
-            point: 2.5
-        }
+            point: 2.5,
+        },
         vShapedInward: {
             name: 'Inward v-shaped',
-            point: 3.0
+            point: 3.0,
         },
         heart: {
             name: 'Heart-shaped',
-            point: 3.5
+            point: 3.5,
         },
     },
     depends: [
