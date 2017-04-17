@@ -537,20 +537,28 @@ var leafBaseShape = new Identifier({
     name: 'Base shape',
     fullName: 'Leaf base shape',
     options: {
-        asymmetric: {},
-        heart: {
-            name: 'Heart-shaped'
+        asymmetric: {
+            point: 0.0
         },
         vShaped: {
-            name: 'V-shaped'
+            name: 'V-shaped',
+            point: 1.5
         },
-        vShapedInward: {
-            name: 'Inward v-shaped'
+        rounded: {
+            point: 2.0
         },
-        rounded: {},
         flatAndWide: {
-            name: 'Flat and wide'
+            name: 'Flat and wide',
+            point: 2.5
         }
+        vShapedInward: {
+            name: 'Inward v-shaped',
+            point: 3.0
+        },
+        heart: {
+            name: 'Heart-shaped',
+            point: 3.5
+        },
     },
     depends: [
         leafType.dependency({
