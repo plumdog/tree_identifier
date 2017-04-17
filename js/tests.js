@@ -69,3 +69,25 @@ QUnit.test('Correct+nearly beats correct+nothing', function(assert) {
 
     assert.ok(matched1.getScore() > matched2.getScore());
 });
+
+
+
+// Assertions about data, not really tests
+
+QUnit.test('Check all have leaf type and bark colour', function(assert) {
+    $.each(trees, function(i, item) {
+        var hasLeafType = false;
+        var hasBarkColour = false
+        $.each(item.identification, function(j, boundIdentifier) {
+            if (Object.is(boundIdentifier.identifier, leafType)) {
+                hasLeafType = true;
+            }
+            if (Object.is(boundIdentifier.identifier, barkColour)) {
+                hasBarkColour = true;
+            }
+        });
+
+        assert.ok(hasLeafType, item.name + ' has leafType');
+        assert.ok(hasBarkColour, item.name + ' has barkColour');
+    });
+});
